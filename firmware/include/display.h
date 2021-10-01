@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <math.h>
+#include "hw_map.h"
 
 // Someone forgot to include Atmega168P...
 #define TIMER1_A_PIN   9
@@ -10,32 +11,19 @@
 #define TIMER1_CLK_PIN 5
 #include <TimerOne.h>
 
-#undef min
-#undef max
-#define ETL_NO_STL
-#include <etl/array.h>
-using namespace etl;
+#include "etl_fix.h"
 
 #include <digitalWriteFast.h>
 
-constexpr int OUT_LEDS = PIN_PC0;
+// TODO: Integrate this trickery into io_tools
+constexpr pin_t SHIFT_CLOCK_D = (1 << Pins::Shift::Clock);
+constexpr pin_t SHIFT_DATA_D = (1 << Pins::Shift::Data);
+constexpr pin_t SHIFT_LATCH_D = (1 << Pins::Shift::Latch);
+constexpr pin_t SHIFT_MUX_A_D = (1 << Pins::Anode::MuxA);
+constexpr pin_t SHIFT_MUX_B_D = (1 << Pins::Anode::MuxB);
 
-constexpr int OUT_MUX_A = PIN_PD3;
-constexpr int OUT_MUX_B = PIN_PD4;
-
-
-constexpr int SHIFT_DATA = PIN_PD7;
-constexpr int SHIFT_CLOCK = PIN_PD6;
-constexpr int SHIFT_LATCH = PIN_PD5;
-
-constexpr uint8_t SHIFT_CLOCK_D = (1 << SHIFT_CLOCK);
-constexpr uint8_t SHIFT_DATA_D = (1 << SHIFT_DATA);
-constexpr uint8_t SHIFT_LATCH_D = (1 << SHIFT_LATCH);
-constexpr uint8_t SHIFT_MUX_A_D = (1 << OUT_MUX_A);
-constexpr uint8_t SHIFT_MUX_B_D = (1 << OUT_MUX_B);
-
-constexpr uint8_t SHIFT_LATCH_DATA_D = SHIFT_DATA_D | SHIFT_LATCH_D;
-constexpr uint8_t SHIFT_MUX_BOTH_D = SHIFT_MUX_A_D | SHIFT_MUX_B_D;
+constexpr pin_t SHIFT_LATCH_DATA_D = SHIFT_DATA_D | SHIFT_LATCH_D;
+constexpr pin_t SHIFT_MUX_BOTH_D = SHIFT_MUX_A_D | SHIFT_MUX_B_D;
 
 constexpr uint8_t register_count = 3;
 static volatile uint8_t register_buffers[4][register_count] = 
@@ -71,15 +59,7 @@ constexpr static uint8_t dot_mapping [2][2] =  {
 class Display {
 
 public:
-    Display() {
-        pinMode(SHIFT_DATA, OUTPUT);
-        pinMode(SHIFT_CLOCK, OUTPUT);
-        pinMode(SHIFT_LATCH, OUTPUT);
-
-        pinMode(OUT_LEDS, OUTPUT);  
-        pinMode(OUT_MUX_A, OUTPUT);
-        pinMode(OUT_MUX_B, OUTPUT);
-    }
+    Display() = default;
 
     void initialize() {
         blank();

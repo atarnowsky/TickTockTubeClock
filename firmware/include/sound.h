@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 #include <digitalWriteFast.h>
+#include "hw_map.h"
 
 enum class TickTockSound : uint8_t {
     None = 0,

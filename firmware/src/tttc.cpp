@@ -1,5 +1,10 @@
 #include <Arduino.h>
 #include <JC_Button.h>
+#include <ustd_array.h>
+
+
+
+#include "io_tools.h"
 
 #include "sound.h"
 static SoundGenerator buzzer(PIN_PC1);
@@ -7,9 +12,11 @@ static SoundGenerator buzzer(PIN_PC1);
 #include "display.h"
 static Display display;
 
+#include "hw_map.h"
 
 #include "ambient_light.h"
 #include "timing.h"
+
 
 uint16_t cnt = 0;
 
@@ -27,11 +34,12 @@ Button button_plus(PIN_PD1);
 Button button_minus(PIN_PD2);
 Button button_select(PIN_PD0);
 
-void setup() {
 
-  pinMode(SDA, INPUT_PULLUP);  
-  pinMode(SCL, INPUT_PULLUP); 
- 
+
+void setup() {
+  Pins::setup();
+  
+
   pinMode(PIN_PB0, OUTPUT);
   digitalWrite(PIN_PB0, LOW);
 
