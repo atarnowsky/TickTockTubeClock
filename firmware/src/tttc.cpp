@@ -35,7 +35,7 @@ void setup() {
 
   sched::initialize();
 
-  SoundGenerator::set_tick_tock(TickTockSound::MonotonousBeep);
+  SoundGenerator::set_tick_tock(TickTockSound::MonotonousClickSilent);
 
   sched::start_critical();
   sched::start_relaxed();

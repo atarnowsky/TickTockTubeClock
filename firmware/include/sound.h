@@ -9,8 +9,10 @@
 
 enum class TickTockSound : uint8_t {
     None = 0,
-    MonotonousClick = 1,
-    MonotonousBeep = 2, 
+    MonotonousClickSilent = 1,
+    MonotonousClickMedium = 2,
+    MonotonousClickLoud = 3,
+    MonotonousBeep = 4, 
 };
 
 // enum class AlarmSound : uint8_t {
@@ -32,10 +34,10 @@ class SoundGenerator : public RelaxedTask<1000> {
     static void process(){
         auto short_click = [](uint8_t length) {
             noInterrupts();
-            for(uint8_t i = 0; i < length; i++) {
-                digitalWriteFast(Pins::Speaker, HIGH);            
-                digitalWriteFast(Pins::Speaker, LOW);
-            }
+            digitalWriteFast(Pins::Speaker, HIGH);            
+            for(uint8_t i = 0; i < length; i++)
+                __asm__ __volatile__ ("nop\n\t");            
+            digitalWriteFast(Pins::Speaker, LOW);
             interrupts();  
         };
 
@@ -47,8 +49,16 @@ class SoundGenerator : public RelaxedTask<1000> {
             case TickTockSound::None:
                 break;
             
-            case TickTockSound::MonotonousClick:
-                short_click(4); 
+            case TickTockSound::MonotonousClickSilent:
+                short_click(16); 
+                break;
+
+            case TickTockSound::MonotonousClickMedium:
+                short_click(32); 
+                break;
+
+            case TickTockSound::MonotonousClickLoud:
+                short_click(64); 
                 break;
 
             case TickTockSound::MonotonousBeep:
