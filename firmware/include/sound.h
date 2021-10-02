@@ -34,15 +34,14 @@ class SoundGenerator : public RelaxedTask<1000> {
     static void process(){
         auto short_click = [](uint8_t length) {
             noInterrupts();
-            digitalWriteFast(Pins::Speaker, HIGH);            
             for(uint8_t i = 0; i < length; i++)
-                __asm__ __volatile__ ("nop\n\t");            
-            digitalWriteFast(Pins::Speaker, LOW);
+                IO::PortC::high(Pins::Speaker);
+            IO::PortC::low(Pins::Speaker);
             interrupts();  
         };
 
         auto short_beep = [](uint8_t length = 50) {
-            tone(Pins::Speaker, 320, length);
+            tone(Pins::Speaker.arduino_pin, 320, length);
         };
 
         switch (tick_tock) {
@@ -89,7 +88,7 @@ class SoundGenerator : public RelaxedTask<1000> {
     {        
         for(int i = 0; i < 4; i++)
         {            
-            tone(Pins::Speaker, ((bits & (1 << i)) > 0 ? 800 : 400), 250);            
+            tone(Pins::Speaker.arduino_pin, ((bits & (1 << i)) > 0 ? 800 : 400), 250);            
             delay(500);
         }
         delay(500);
@@ -98,7 +97,7 @@ class SoundGenerator : public RelaxedTask<1000> {
     static void ack(uint8_t times = 1){
         for(uint8_t i = 0; i < times; i++)
         {
-            tone(Pins::Speaker, 4000, 50);
+            tone(Pins::Speaker.arduino_pin, 4000, 50);
             delay(100);
         }
     }

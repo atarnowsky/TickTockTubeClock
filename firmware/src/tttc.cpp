@@ -7,6 +7,7 @@
 #include "display.h"
 #include "ambient_light.h"
 #include "timing.h"
+#include "base_light.h"
 
 #include "state_machine.h" // TODO: Incomplete
 
@@ -18,6 +19,7 @@
 
 using sched = Scheduler<4000, 
   Display::ShiftPWMProcessor,
+  BaseLightDimmer,
   Display::SeparatorDot,
   StateMachine,
   RTCSync,
@@ -27,15 +29,16 @@ using sched = Scheduler<4000,
 
 void setup() {    
   // TODO: Is this needed anymore?
-  pinMode(PIN_PB0, OUTPUT);
-  digitalWrite(PIN_PB0, LOW);
+  // pinMode(PIN_PB0, OUTPUT);
+  // digitalWrite(PIN_PB0, LOW);
 
 
   Pins::setup();  
 
   sched::initialize();
 
-  SoundGenerator::set_tick_tock(TickTockSound::MonotonousClickSilent);
+  SoundGenerator::set_tick_tock(TickTockSound::MonotonousClickLoud);
+  Display::BufferControl::show_number(1.234f);
 
   sched::start_critical();
   sched::start_relaxed();

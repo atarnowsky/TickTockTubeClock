@@ -6,6 +6,18 @@
 
 using pin_t = uint8_t;
 
+enum class Port {
+    C,
+    D
+};
+
+struct ppin_t {
+    Port  port;
+    pin_t pin_mask;
+    pin_t arduino_pin; // This is only temporary, since proper pin configuration is implemented
+};
+
+
 struct IO {
 
  private:    
@@ -22,6 +34,12 @@ struct IO {
             ::pinMode(pin, MODE); 
     }
 
+    template<int MODE>
+    static inline void configurePin(ppin_t pin) 
+    { 
+        ::pinMode(pin.arduino_pin, MODE); 
+    }
+
  public:
     template<int MODE, typename... PINS>
     static inline void configure(PINS const&... args) {
@@ -29,41 +47,42 @@ struct IO {
     }
 
     // PORTD -> Shift registers
-    // PORTC / PC0 -> Light
-        
+    // PORTC / PC0 -> Light / PC1 -> Speaker
+    
+    // FIXME: Automatically choose correct port
     struct PortD {
         __attribute__((always_inline))
-        static inline void high(pin_t pin){
-        PORTD = PORTD | pin;
+        static inline void high(const ppin_t& pin){
+        PORTD = PORTD | pin.pin_mask;
         }
         
         __attribute__((always_inline))
-        static inline void low(pin_t pin){
-        PORTD = PORTD & (~pin);
+        static inline void low(const ppin_t& pin){
+        PORTD = PORTD & (~pin.pin_mask);
         }
         
         __attribute__((always_inline))
-        static inline void pulse(pin_t pin){
-        PORTD = PORTD | pin;
-        PORTD = PORTD & (~pin);
+        static inline void pulse(const ppin_t& pin){
+        PORTD = PORTD | pin.pin_mask;
+        PORTD = PORTD & (~pin.pin_mask);
         }
     };
 
-    struct sn74hc595 {        
-        template<unsigned char PORT_CLOCK,
-                 unsigned char PORT_DATA>
+    struct PortC {
         __attribute__((always_inline))
-        __attribute__((optimize("unroll-loops")))
-        static inline void shift_out(uint8_t data){  
-            for(uint8_t i = 0; i < 8; i++){   
-                PortD::low(PORT_CLOCK);
-                if((data & 0b00000001))
-                    PortD::high(PORT_DATA);
-                else
-                    PortD::low(PORT_DATA);
-                PortD::high(PORT_CLOCK);
-                data >>= 1;
-            }
+        static inline void high(const ppin_t& pin){
+        PORTC = PORTC | pin.pin_mask;
+        }
+        
+        __attribute__((always_inline))
+        static inline void low(const ppin_t& pin){
+        PORTC = PORTC & (~pin.pin_mask);
+        }
+        
+        __attribute__((always_inline))
+        static inline void pulse(const ppin_t& pin){
+        PORTC = PORTC | pin.pin_mask;
+        PORTC = PORTC & (~pin.pin_mask);
         }
     };
 };

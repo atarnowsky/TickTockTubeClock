@@ -10,16 +10,8 @@
 #include <digitalWriteFast.h>
 
 namespace Display {
-
-    // TODO: Integrate this trickery into io_tools
-    constexpr pin_t SHIFT_CLOCK_D = (1 << Pins::Shift::Clock);
-    constexpr pin_t SHIFT_DATA_D = (1 << Pins::Shift::Data);
-    constexpr pin_t SHIFT_LATCH_D = (1 << Pins::Shift::Latch);
-    constexpr pin_t SHIFT_MUX_A_D = (1 << Pins::Anode::MuxA);
-    constexpr pin_t SHIFT_MUX_B_D = (1 << Pins::Anode::MuxB);
-
-    constexpr pin_t SHIFT_LATCH_DATA_D = SHIFT_DATA_D | SHIFT_LATCH_D;
-    constexpr pin_t SHIFT_MUX_BOTH_D = SHIFT_MUX_A_D | SHIFT_MUX_B_D;
+    constexpr ppin_t SHIFT_LATCH_DATA_D = {Port::D, Pins::Shift::Data.pin_mask | Pins::Shift::Latch.pin_mask, 0};
+    constexpr ppin_t SHIFT_MUX_BOTH_D = {Port::D, Pins::Anode::MuxA.pin_mask | Pins::Anode::MuxB.pin_mask, 0};
 
     // There are a total of four buffer used, two for showing numbers (MUXA and MUXB)
     // the other two for dots only. Both are shown in alternating order.
@@ -61,7 +53,7 @@ namespace Display {
         {0, 0}, {2,7}    // Dot
     };
 
-    class ShiftPWMProcessor : public  CriticalTask<32>  {
+    class ShiftPWMProcessor : public CriticalTask<32>  {
      public:
         static void initialize(uint16_t update_rate) {
             blank(); // Clear registers to assure no random numbers show up on startup
@@ -93,9 +85,9 @@ namespace Display {
             IO::PortD::low(SHIFT_LATCH_DATA_D);
             for (uint8_t i = 0; i < 24; i++)
             {
-                IO::PortD::pulse(SHIFT_CLOCK_D);
+                IO::PortD::pulse(Pins::Shift::Clock);
             }
-            IO::PortD::high(SHIFT_LATCH_D);
+            IO::PortD::high(Pins::Shift::Latch);
             IO::PortD::low(SHIFT_MUX_BOTH_D);
         }
         
@@ -108,24 +100,24 @@ namespace Display {
         
         static void show_ones(uint8_t index)
         {
-            IO::PortD::low(SHIFT_LATCH_D);   
-            IO::sn74hc595::shift_out<SHIFT_CLOCK_D, SHIFT_DATA_D>(register_buffers[index][0]);
-            IO::sn74hc595::shift_out<SHIFT_CLOCK_D, SHIFT_DATA_D>(register_buffers[index][1]);
-            IO::sn74hc595::shift_out<SHIFT_CLOCK_D, SHIFT_DATA_D>(register_buffers[index][2]);    
-            IO::PortD::low(SHIFT_MUX_A_D);
-            IO::PortD::high(SHIFT_MUX_B_D);    
-            IO::PortD::high(SHIFT_LATCH_D); 
+            IO::PortD::low(Pins::Shift::Latch);   
+            Pins::Shift::shift_out(register_buffers[index][0]);
+            Pins::Shift::shift_out(register_buffers[index][1]);
+            Pins::Shift::shift_out(register_buffers[index][2]);    
+            IO::PortD::low(Pins::Anode::MuxA);
+            IO::PortD::high(Pins::Anode::MuxB);    
+            IO::PortD::high(Pins::Shift::Latch); 
         }
 
         static void show_tens(uint8_t index) 
         {
-            IO::PortD::low(SHIFT_LATCH_D);   
-            IO::sn74hc595::shift_out<SHIFT_CLOCK_D, SHIFT_DATA_D>(register_buffers[index][0]);
-            IO::sn74hc595::shift_out<SHIFT_CLOCK_D, SHIFT_DATA_D>(register_buffers[index][1]);
-            IO::sn74hc595::shift_out<SHIFT_CLOCK_D, SHIFT_DATA_D>(register_buffers[index][2]);    
-            IO::PortD::high(SHIFT_MUX_A_D);
-            IO::PortD::low(SHIFT_MUX_B_D);    
-            IO::PortD::high(SHIFT_LATCH_D); 
+            IO::PortD::low(Pins::Shift::Latch);   
+            Pins::Shift::shift_out(register_buffers[index][0]);
+            Pins::Shift::shift_out(register_buffers[index][1]);
+            Pins::Shift::shift_out(register_buffers[index][2]);    
+            IO::PortD::high(Pins::Anode::MuxA);
+            IO::PortD::low(Pins::Anode::MuxB);    
+            IO::PortD::high(Pins::Shift::Latch); 
         }                 
     };
 
