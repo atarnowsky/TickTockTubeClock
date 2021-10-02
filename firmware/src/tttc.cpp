@@ -1,144 +1,47 @@
 #include <Arduino.h>
-#include <JC_Button.h>
-#include <ustd_array.h>
-
-
 
 #include "io_tools.h"
-
-#include "sound.h"
-static SoundGenerator buzzer(PIN_PC1);
-
-#include "display.h"
-static Display display;
-
 #include "hw_map.h"
 
+#include "sound.h"
+#include "display.h"
 #include "ambient_light.h"
 #include "timing.h"
 
+#include "state_machine.h" // TODO: Incomplete
 
-uint16_t cnt = 0;
+#include "scheduler.h"
 
-constexpr uint8_t states = 4;
-enum State {
-  Time = 0,
-  Temperature = 1,
-  LightMeter = 2,
-  Off = 3
-};
+// TODO: Add temperature watchdog that shuts down the display in case of over temperature
 
-uint8_t current_state = Time;
+// TODO: Add some EEPROM management base class for tasks
 
-Button button_plus(PIN_PD1);
-Button button_minus(PIN_PD2);
-Button button_select(PIN_PD0);
+using sched = Scheduler<4000, 
+  Display::ShiftPWMProcessor,
+  Display::SeparatorDot,
+  StateMachine,
+  RTCSync,
+  AmbientLight,
+  SoundGenerator
+>;
 
-
-
-void setup() {
-  Pins::setup();
-  
-
+void setup() {    
+  // TODO: Is this needed anymore?
   pinMode(PIN_PB0, OUTPUT);
   digitalWrite(PIN_PB0, LOW);
 
-  button_plus.begin();
-  button_minus.begin();
-  button_select.begin();
-  
-  display.initialize();
-  display.led_off();     
-  buzzer.set_tick_tock(TickTockSound::None);
-  init_luxmeter();
-  init_rtc();
+
+  Pins::setup();  
+
+  sched::initialize();
+
+  SoundGenerator::set_tick_tock(TickTockSound::MonotonousBeep);
+
+  sched::start_critical();
+  sched::start_relaxed();
 }
 
-bool led_state = false;
-bool long_plus = false;
-
-uint16_t wait_timer = 0;
-
 void loop() {
-  wait_timer++;
-  if(wait_timer > 1000) wait_timer = 0;
-
-  button_plus.read();
-  button_minus.read();
-  button_select.read();
-  buzzer.process();
-  display.process();
-
-  if(button_select.pressedFor(500) && !long_plus)
-  {
-    long_plus = true;
-    led_state = !led_state;
-    buzzer.ack(2);
-    if(led_state) 
-    {
-      display.led_on();
-      buzzer.set_tick_tock(TickTockSound::BitoneClick);
-    }
-    else 
-    {
-      display.led_off();
-      buzzer.set_tick_tock(TickTockSound::None);
-    }
-  }
-
-   if(button_select.wasReleased())
-   {
-    long_plus = false;
-   }
-
-  if(button_select.wasPressed())
-  {
-    current_state++;
-    current_state = current_state % states;  
-    buzzer.ack();
-    wait_timer = 0;
-  }
-
-  if(button_minus.wasPressed() && current_state == Time)
-  {
-    increment_minutes();
-    buzzer.ack();
-  }
-
-  if(button_plus.wasPressed() && current_state == Time)
-  {
-    increment_hours();
-    buzzer.ack();
-  }
-
-  switch (current_state)
-  {
-  case Time:
-      if(wait_timer == 0)
-        display.time(current_time());
-    break;
-
-    case Temperature:
-    {
-      if(wait_timer == 0){
-      float temperature = RTC.temperature() / 4.0f;
-      display.number(temperature);
-      }
-    }    
-    break;
-
-    case LightMeter:
-    {
-      if(wait_timer == 0) {
-      OPT3001 result = opt3001.readResult();  
-      display.number(result.lux);
-      }
-    }
-    break;
-  
-  default:
-      display.clear();
-    break;
-  }
-
+  // Will never be called
+  // TODO: use traditional main() function instead of this Arduino stuff...
 }

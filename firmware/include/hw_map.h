@@ -7,7 +7,6 @@
 // This file contains all pin mappings and is included by almost all other files.
 // In case of new hardware revisions, make sure this file gets adjusted accordingly.
 
-using pin_t = uint8_t;
 
 namespace Pins {    
     constexpr array<pin_t, 3> Buttons = {PIN_PD1, PIN_PD2, PIN_PD0};
