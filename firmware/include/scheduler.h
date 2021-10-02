@@ -40,7 +40,7 @@ class Scheduler {
                     // This however, would make the state lookup way more complicated
                     // (would need some 'count_critical' and 'index_of_critical' functions)
                     uint32_t& task_state = state[index_of<T, Tasks...>()];
-                    T::process(task_state);
+                    T::process(task_state++);
                     if(task_state >= T::cycle_count) {
                         task_state = 0;
                     }
