@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#define BENCHMARK
+
 #include "io_tools.h"
 #include "hw_map.h"
 
@@ -12,6 +14,7 @@
 #include "state_machine.h" // TODO: Incomplete
 
 #include "scheduler.h"
+#include "benchmark.h"
 
 // TODO: Add temperature watchdog that shuts down the display in case of over temperature
 
@@ -20,25 +23,23 @@
 using sched = Scheduler<4000, 
   Display::ShiftPWMProcessor,
   BaseLightDimmer,
-  Display::SeparatorDot,
-  StateMachine,
-  RTCSync,
-  AmbientLight,
-  SoundGenerator
+  //Display::SeparatorDot,
+  //StateMachine,
+  //RTCSync,
+  //AmbientLight,
+  //SoundGenerator,
+  TimingBenchmark
 >;
 
 void setup() {    
-  // TODO: Is this needed anymore?
-  // pinMode(PIN_PB0, OUTPUT);
-  // digitalWrite(PIN_PB0, LOW);
-
-
   Pins::setup();  
+
+  TimingBenchmark::setup(&sched::benchmark_micros_total, &sched::benchmark_counts);
 
   sched::initialize();
 
   SoundGenerator::set_tick_tock(TickTockSound::MonotonousClickLoud);
-  Display::BufferControl::show_number(1.234f);
+  //Display::BufferControl::show_number(1.234f);
 
   sched::start_critical();
   sched::start_relaxed();

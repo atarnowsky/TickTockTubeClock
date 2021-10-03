@@ -47,7 +47,16 @@ class Scheduler {
                 }
             };
 
+            #ifdef BENCHMARK
+                uint32_t now = micros();
+            #endif
+
             (void)(step_critical(Tasks()), ...);
+
+            #ifdef BENCHMARK
+                benchmark_micros_total += (micros() - now);
+                benchmark_counts++;
+            #endif
         });   
     }
 
@@ -74,6 +83,12 @@ class Scheduler {
     
     // TODO: Add on_error signal
 
+
+#ifdef BENCHMARK
+    static volatile uint32_t benchmark_micros_total;
+    static volatile uint32_t benchmark_counts;
+#endif
+
  private:
     // Stores the internal "state" of each task.
     // Depending whether the task is critical or not, the corresponding integer
@@ -85,6 +100,16 @@ class Scheduler {
 
 template<int UpdateRateHerz, typename... Tasks>
 array<uint32_t, sizeof...(Tasks)> Scheduler<UpdateRateHerz, Tasks...>::state = {};
+
+
+
+#ifdef BENCHMARK
+    template<int UpdateRateHerz, typename... Tasks>
+    volatile uint32_t Scheduler<UpdateRateHerz, Tasks...>::benchmark_micros_total = 0;
+
+    template<int UpdateRateHerz, typename... Tasks>
+    volatile uint32_t Scheduler<UpdateRateHerz, Tasks...>::benchmark_counts = 0;
+#endif
 
 
 template<unsigned int round_trip>
