@@ -112,20 +112,28 @@ struct IO {
     // If given pins are declared as constexpr, the compiler
     // will optimize the ifs away!
 
+    template<typename... PINs>
     __attribute__((always_inline))
-    static inline void high(const ppin_t& pin){
-        if (pin.port == Port::C)
-            PORTC = PORTC | pin.pin_mask;
-        else if (pin.port == Port::D)
-            PORTD = PORTD | pin.pin_mask;
+    static inline void high(PINs const&... pins){        
+        if ( ((Port::C == pins.port) && ...) )
+            PORTC = PORTC | (pins.pin_mask | ...);
+        else if ( ((Port::D == pins.port) && ...) )
+            PORTD = PORTD | (pins.pin_mask | ...);
+        else { 
+            // TODO: Fallback -> Use regular loop
+        }
     }
 
+    template<typename... PINs>
     __attribute__((always_inline))
-    static inline void low(const ppin_t& pin){
-        if (pin.port == Port::C)
-            PORTC = PORTC & (~pin.pin_mask);
-        else if (pin.port == Port::D)
-            PORTD = PORTD & (~pin.pin_mask);
+    static inline void low(PINs const&... pins){        
+        if ( ((Port::C == pins.port) && ...) )
+            PORTC = PORTC & (~(pins.pin_mask | ...));
+        else if ( ((Port::D == pins.port) && ...) )
+            PORTD = PORTD & (~(pins.pin_mask | ...));
+        else { 
+            // TODO: Fallback -> Use regular loop
+        }
     }
 
     __attribute__((always_inline))

@@ -57,39 +57,34 @@ namespace Display {
             blank(); // Clear registers to assure no random numbers show up on startup
         } 
 
-        static void process(uint16_t cycle_count) {
-            (void) cycle_count; // TODO: Use calls instead of cnt
-            static uint8_t cnt = 0;    
-            if(cnt < 8) 
+        static void process(uint16_t cycle_count) {     
+
+            // Ghosting prevention: Put in a short blank frame between mux change 
+            if(cycle_count % 8 == 0) {
+                show_nothing();
+                return;
+            }
+
+            if(cycle_count < 8) 
                 show_ones(0);
-            else if (cnt < 16)
+            else if (cycle_count < 16)
                 show_ones(1);
-            else if(cnt < 24)
+            else if(cycle_count < 24)
                 show_tens(2);
             else 
-                show_tens(3);
-            //if(cnt > brightness) 
-            //  blank();    
-            //else if(cnt >= (brightness>>1))     
-            //  show_tens();
-            //else
-            //  show_ones();
-            ++cnt &= 0b00011111;
+                show_tens(3);            
         }
 
      private:
         static void blank()
         {
-            constexpr ppin_t SHIFT_LATCH_DATA_D = {Port::D, Pins::Shift::Data.pin_mask | Pins::Shift::Latch.pin_mask};
-            constexpr ppin_t SHIFT_MUX_BOTH_D = {Port::D, Pins::Anode::MuxA.pin_mask | Pins::Anode::MuxB.pin_mask};
-
-            IO::low(SHIFT_LATCH_DATA_D);
+            IO::low(Pins::Shift::Data, Pins::Shift::Latch);
             for (uint8_t i = 0; i < 24; i++)
             {
                 IO::pulse(Pins::Shift::Clock);
             }
             IO::high(Pins::Shift::Latch);
-            IO::low(SHIFT_MUX_BOTH_D);
+            IO::low(Pins::Anode::MuxA, Pins::Anode::MuxB);
         }
         
         static void clear() {
@@ -120,6 +115,17 @@ namespace Display {
             IO::low(Pins::Anode::MuxB);    
             IO::high(Pins::Shift::Latch); 
         }                 
+    
+        static void show_nothing() 
+        {
+            IO::low(Pins::Shift::Latch);   
+            Pins::Shift::shift_out(0b00000000);
+            Pins::Shift::shift_out(0b00000000);
+            Pins::Shift::shift_out(0b00000000);    
+            IO::low(Pins::Anode::MuxA);
+            IO::low(Pins::Anode::MuxB);    
+            IO::high(Pins::Shift::Latch); 
+        }    
     };
 
     class BufferControl {

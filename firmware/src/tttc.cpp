@@ -16,9 +16,17 @@
 #include "scheduler.h"
 #include "benchmark.h"
 
-// TODO: Add temperature watchdog that shuts down the display in case of over temperature
+// Features that will be implemented in future releases:
+//  - Allow Display to control multiplexing (Alternating, AOnly, BOnly, Off)
+//    (needed for cathode poisoning prevention)
+//  - Add blink feature to BufferControl
+//  - Display dimming
+//  - Better ghosting prevention
+//  - Temperature watchdog that shuts down the display in case of over temperature
+//  - EEPROM management
+//  - Cathode poisoning prevention with customizable time(-span)
+//  - Various display-change effects
 
-// TODO: Add some EEPROM management base class for tasks
 
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
