@@ -19,6 +19,7 @@ class TimingBenchmark : public RelaxedTask<1000> {
 
     static void setup(volatile uint32_t* a, volatile uint32_t* c) {
         accu = a;
+        count = c;
     }
 
  private:
@@ -28,3 +29,9 @@ class TimingBenchmark : public RelaxedTask<1000> {
 
 volatile uint32_t* TimingBenchmark::accu = nullptr;
 volatile uint32_t* TimingBenchmark::count = nullptr;   
+
+// Some results:
+// ShiftPWMProcessor + BaseLightDimmer
+// -O3: 82µs
+// -O2: 88µs
+// -Os: 80µs

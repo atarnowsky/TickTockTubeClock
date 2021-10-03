@@ -20,14 +20,14 @@
 
 // TODO: Add some EEPROM management base class for tasks
 
-using sched = Scheduler<4000, 
+using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
   BaseLightDimmer,
   //Display::SeparatorDot,
   //StateMachine,
   //RTCSync,
   //AmbientLight,
-  //SoundGenerator,
+  SoundGenerator,
   TimingBenchmark
 >;
 

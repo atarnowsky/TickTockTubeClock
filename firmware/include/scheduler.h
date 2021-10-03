@@ -34,6 +34,10 @@ class Scheduler {
         // Run critical tasks within ISR context
         Timer1.initialize(1'000'000 / UpdateRateHerz);
         Timer1.attachInterrupt([](){
+            #ifdef BENCHMARK
+                uint32_t now = micros();
+            #endif
+            
             auto step_critical = []<typename T>(const T&) constexpr {
                 if constexpr (T::critical) {
                     // TODO: Using an 32bit value here is pretty inefficient, since 8bit normally would do it
@@ -45,11 +49,7 @@ class Scheduler {
                         task_state = 0;
                     }
                 }
-            };
-
-            #ifdef BENCHMARK
-                uint32_t now = micros();
-            #endif
+            };            
 
             (void)(step_critical(Tasks()), ...);
 

@@ -9,12 +9,8 @@
 
 #include "etl_fix.h"
 
-#include <digitalWriteFast.h>
 
 namespace Display {
-    constexpr ppin_t SHIFT_LATCH_DATA_D = {Port::D, Pins::Shift::Data.pin_mask | Pins::Shift::Latch.pin_mask, 0};
-    constexpr ppin_t SHIFT_MUX_BOTH_D = {Port::D, Pins::Anode::MuxA.pin_mask | Pins::Anode::MuxB.pin_mask, 0};
-
     // There are a total of four buffer used, two for showing numbers (MUXA and MUXB)
     // the other two for dots only. Both are shown in alternating order.
     // This effectively cuts the maximum brightness in half, but
@@ -84,13 +80,16 @@ namespace Display {
      private:
         static void blank()
         {
-            IO::PortD::low(SHIFT_LATCH_DATA_D);
+            constexpr ppin_t SHIFT_LATCH_DATA_D = {Port::D, Pins::Shift::Data.pin_mask | Pins::Shift::Latch.pin_mask};
+            constexpr ppin_t SHIFT_MUX_BOTH_D = {Port::D, Pins::Anode::MuxA.pin_mask | Pins::Anode::MuxB.pin_mask};
+
+            IO::low(SHIFT_LATCH_DATA_D);
             for (uint8_t i = 0; i < 24; i++)
             {
-                IO::PortD::pulse(Pins::Shift::Clock);
+                IO::pulse(Pins::Shift::Clock);
             }
-            IO::PortD::high(Pins::Shift::Latch);
-            IO::PortD::low(SHIFT_MUX_BOTH_D);
+            IO::high(Pins::Shift::Latch);
+            IO::low(SHIFT_MUX_BOTH_D);
         }
         
         static void clear() {
@@ -102,24 +101,24 @@ namespace Display {
         
         static void show_ones(uint8_t index)
         {
-            IO::PortD::low(Pins::Shift::Latch);   
+            IO::low(Pins::Shift::Latch);   
             Pins::Shift::shift_out(register_buffers[index][0]);
             Pins::Shift::shift_out(register_buffers[index][1]);
             Pins::Shift::shift_out(register_buffers[index][2]);    
-            IO::PortD::low(Pins::Anode::MuxA);
-            IO::PortD::high(Pins::Anode::MuxB);    
-            IO::PortD::high(Pins::Shift::Latch); 
+            IO::low(Pins::Anode::MuxA);
+            IO::high(Pins::Anode::MuxB);    
+            IO::high(Pins::Shift::Latch); 
         }
 
         static void show_tens(uint8_t index) 
         {
-            IO::PortD::low(Pins::Shift::Latch);   
+            IO::low(Pins::Shift::Latch);   
             Pins::Shift::shift_out(register_buffers[index][0]);
             Pins::Shift::shift_out(register_buffers[index][1]);
             Pins::Shift::shift_out(register_buffers[index][2]);    
-            IO::PortD::high(Pins::Anode::MuxA);
-            IO::PortD::low(Pins::Anode::MuxB);    
-            IO::PortD::high(Pins::Shift::Latch); 
+            IO::high(Pins::Anode::MuxA);
+            IO::low(Pins::Anode::MuxB);    
+            IO::high(Pins::Shift::Latch); 
         }                 
     };
 
@@ -260,19 +259,4 @@ namespace Display {
             BufferControl::show_dots({false, separator_visible, false, false});                
         }
     };
-
-
-    // __attribute__((always_inline))
-    // static inline void ledHigh(){
-    // //PORTC = PORTC | PC0;
-    // digitalWriteFast(PIN_PC0, HIGH);
-    // }            
-
-    // __attribute__((always_inline))
-    // static inline void ledLow(){
-    // //PORTC = PORTC & (~PC0);
-    // digitalWriteFast(PIN_PC0, LOW);
-    // }            
-
-
 }
