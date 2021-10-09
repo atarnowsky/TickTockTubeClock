@@ -6,10 +6,11 @@
 
 enum class TickTockSound : uint8_t {
     None = 0,
-    MonotonousClickSilent = 1,
-    MonotonousClickMedium = 2,
-    MonotonousClickLoud = 3,
-    MonotonousBeep = 4, 
+    ClickSilent = 1,
+    ClickMedium = 2,
+    ClickLoud = 3,
+    LowBeep = 4, 
+    HighBeep = 5, 
 };
 
 // enum class AlarmSound : uint8_t {
@@ -37,28 +38,32 @@ class SoundGenerator : public RelaxedTask<1000> {
             interrupts();  
         };
 
-        auto short_beep = [](uint8_t length = 50) {
-            tone(Pins::Speaker.arduino_pin(), 320, length);
+        auto short_beep = [](uint8_t length = 50, int16_t freq = 320) {
+            tone(Pins::Speaker.arduino_pin(), freq, length);
         };
 
         switch (tick_tock) {
             case TickTockSound::None:
                 break;
             
-            case TickTockSound::MonotonousClickSilent:
+            case TickTockSound::ClickSilent:
                 short_click(16); 
                 break;
 
-            case TickTockSound::MonotonousClickMedium:
+            case TickTockSound::ClickMedium:
                 short_click(32); 
                 break;
 
-            case TickTockSound::MonotonousClickLoud:
+            case TickTockSound::ClickLoud:
                 short_click(64); 
                 break;
 
-            case TickTockSound::MonotonousBeep:
-                short_beep(50);
+            case TickTockSound::LowBeep:
+                short_beep(20, speaker_resonant_frequency >> 4);
+                break;                
+
+            case TickTockSound::HighBeep:
+                short_beep(20, speaker_resonant_frequency);
                 break;                
         }
     }
@@ -100,6 +105,7 @@ class SoundGenerator : public RelaxedTask<1000> {
     }
 
  private:
+    static constexpr uint16_t speaker_resonant_frequency = 4000; // [Hz]
     static TickTockSound tick_tock;
     //static AlarmSound alarm_sound;    
 };

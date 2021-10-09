@@ -46,8 +46,11 @@ void setup() {
 
   sched::initialize();
 
-  SoundGenerator::set_tick_tock(TickTockSound::MonotonousClickLoud);
+  SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
   //Display::BufferControl::show_number(1.234f);
+
+  BaseLightDimmer::set_fade_speed(2);
+  BaseLightDimmer::set_fade_target(64);
 
   sched::start_critical();
   sched::start_relaxed();
