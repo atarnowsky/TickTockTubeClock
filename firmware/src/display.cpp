@@ -1,4 +1,5 @@
 #include "display.h"
+#include "hw_map.h"
 
 namespace Display {
 
@@ -57,9 +58,9 @@ namespace Display {
     void ShiftPWMProcessor::show_ones(uint8_t index)
     {
         IO::low(Pins::Shift::Latch);   
-        Pins::Shift::shift_out(register_buffers[index][0]);
-        Pins::Shift::shift_out(register_buffers[index][1]);
-        Pins::Shift::shift_out(register_buffers[index][2]);    
+        Pins::Shift::shift_out(register_buffers[index][0], 
+                               register_buffers[index][1], 
+                               register_buffers[index][2]);
         IO::low(Pins::Anode::MuxA);
         IO::high(Pins::Anode::MuxB, Pins::Shift::Latch); 
     }
@@ -67,9 +68,9 @@ namespace Display {
     void ShiftPWMProcessor::show_tens(uint8_t index) 
     {
         IO::low(Pins::Shift::Latch);   
-        Pins::Shift::shift_out(register_buffers[index][0]);
-        Pins::Shift::shift_out(register_buffers[index][1]);
-        Pins::Shift::shift_out(register_buffers[index][2]);    
+        Pins::Shift::shift_out(register_buffers[index][0], 
+                               register_buffers[index][1], 
+                               register_buffers[index][2]);
         IO::low(Pins::Anode::MuxB);    
         IO::high(Pins::Anode::MuxA, Pins::Shift::Latch); 
     }                 
@@ -77,9 +78,7 @@ namespace Display {
     void ShiftPWMProcessor::show_nothing() 
     {
         IO::low(Pins::Shift::Latch);   
-        Pins::Shift::shift_out(0b00000000);
-        Pins::Shift::shift_out(0b00000000);
-        Pins::Shift::shift_out(0b00000000);    
+        Pins::Shift::shift_out(0, 0, 0);
         IO::low(Pins::Anode::MuxA, Pins::Anode::MuxB);
         IO::high(Pins::Shift::Latch); 
     }    

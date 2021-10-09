@@ -1,12 +1,7 @@
 
 #pragma once
 
-#include <Arduino.h>
-#include <stdint.h>
-#include <math.h>
-#include "hw_map.h"
 #include "scheduler.h"
-
 #include "etl_fix.h"
 
 

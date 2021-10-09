@@ -13,15 +13,3 @@ void Pins::setup() {
         Anode::MuxA, Anode::MuxB
     );
 }
-
-void Pins::Shift::shift_out(uint8_t data){  
-    for(uint8_t i = 0; i < 8; i++){   
-        IO::low(Clock);
-        if((data & 0b00000001))
-            IO::high(Data);
-        else
-            IO::low(Data);
-        IO::high(Clock);
-        data >>= 1;
-    }
-}

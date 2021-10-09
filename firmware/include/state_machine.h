@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
 #include <JC_Button.h>
 
 #include "scheduler.h"

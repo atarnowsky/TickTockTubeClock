@@ -1,5 +1,7 @@
 #include "ambient_light.h"
 
+#include <ClosedCube_OPT3001.h>
+
 namespace {
     ClosedCube_OPT3001 opt3001;
     float current_lux = 0.0f;

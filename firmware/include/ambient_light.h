@@ -1,12 +1,12 @@
 #pragma once
 
-#include <ClosedCube_OPT3001.h>
 #include "scheduler.h"
 
 class AmbientLight : public RelaxedTask<2500> {
  public:
     static void initialize();
     static void process();
+    
     static float lux();
 
  private:

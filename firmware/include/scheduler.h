@@ -1,13 +1,8 @@
 #pragma once
 
-// Someone forgot to include Atmega168P...
-#define TIMER1_A_PIN   9
-#define TIMER1_B_PIN   10
-#define TIMER1_ICP_PIN 8
-#define TIMER1_CLK_PIN 5
+#include "etl_fix.h"
 #include <TimerOne.h>
 
-#include "etl_fix.h"
 
 template<int UpdateRateHerz, typename... Tasks>
 class Scheduler {

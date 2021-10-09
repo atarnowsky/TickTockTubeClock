@@ -1,8 +1,7 @@
 #pragma once 
 
-#include <Arduino.h>
 #include "etl_fix.h"
-
+#include <Arduino.h>
 
 using pin_t = uint8_t;
 

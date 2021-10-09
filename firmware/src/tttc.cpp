@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 #define BENCHMARK
 
 #include "io_tools.h"
