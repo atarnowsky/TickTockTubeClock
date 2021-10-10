@@ -104,12 +104,18 @@ namespace Display {
     // [2]  https://docs.daliborfarny.com/documentation/cathode-poisoning-prevention-routine/
     // [3]  https://www.youtube.com/watch?v=RwDEhyfa7OI - see comments section
     
-    constexpr uint16_t acp_duration = 10; // [ms]
+    constexpr uint16_t acp_duration = 10; // [ms]    
     class AntiCathodePoisoning : public RelaxedTask<acp_duration> {
      public:
         static void initialize();
         static void process();
         static void enable();
         static void disable();
+
+     private:
+        // The stacking order of the tubes individual digits - here specific for the CD81
+        // This array is used to add some kind of '3D' effect, cycling the digits
+        // from back to front.
+        static constexpr uint8_t cycle_order[14] = {0, 1, 9, 5, 4, 3, 2, 6, 7, 8, 255, 255, 255, 255};
     };
 }

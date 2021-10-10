@@ -279,7 +279,9 @@ namespace Display {
         static bool mux = false;
         if(!acp_enabled) return;
        
-        BufferControl::show_direct({i, i, i, i}, {i == 10, i == 11, i == 12, i == 13});
+        BufferControl::show_direct(
+            {cycle_order[i], cycle_order[i], cycle_order[i], cycle_order[i]}, 
+            {i == 10, i == 11, i == 12, i == 13});
         
         if(++i > 13) {
             i = 0;
