@@ -27,23 +27,20 @@
 
 
 
-class Demo : public RelaxedTask<5000> {
+class Demo : public RelaxedTask<500> {
   public:
     static void initialize() {
-      Display::AntiCathodePoisoning::enable();  
+      Display::ShiftPWMProcessor::set_fade_speed(16);
     }
 
     static void process() {
-      static uint8_t cnt = 0;
-      if(cnt == 0) {
-        Display::AntiCathodePoisoning::disable();
-        Display::BufferControl::show_number(1.234f);  
-      }
-      else if(cnt == 1)
-        Display::AntiCathodePoisoning::enable();        
+      static bool dir = false;
+      dir = !dir;
+      if(dir)
+        Display::ShiftPWMProcessor::set_fade_target(0);
+      else
+        Display::ShiftPWMProcessor::set_fade_target(255);
       
-      cnt++;
-      if(cnt > 1) cnt = 0;
     }
 };
 

@@ -25,6 +25,12 @@ namespace Display {
     volatile ShiftPWMProcessor::MUXMask mux_mask = ShiftPWMProcessor::MUXMask::BOTH;
 
 
+    namespace {
+        uint16_t fade_state = 0;
+        uint16_t fade_target = 0;
+        uint8_t fade_increment = 0;
+    }
+
     // ShiftPWMProcessor ---
     void ShiftPWMProcessor::initialize(uint16_t update_rate) {
         clear(); // Clear registers to assure no random numbers show up on startup
@@ -46,7 +52,23 @@ namespace Display {
             show_nothing();
             return;
         }
-    
+
+        // Fade complete display
+        if(fade_state != fade_target) {
+            if(fade_state < fade_target)
+                fade_state += fade_increment;
+            else if(fade_state > fade_target)
+                fade_state -= fade_increment;
+        }
+
+        //                           16bit    ->       8bit        -> 0..31
+        const uint16_t pwm_width = fade_state >> slowmotion_factor >> 3;    
+
+        if(cycle_count % 8 > pwm_width) {
+            show_nothing();
+            return;
+        }
+
         if(cycle_count < 8) 
             show_ones(0);
         else if (cycle_count < 16)
@@ -61,6 +83,20 @@ namespace Display {
     // to temporarily disable muxing
     void ShiftPWMProcessor::configure_mux(MUXMask mask){
         mux_mask = mask;
+    }
+
+    
+    void ShiftPWMProcessor::set_brightness(uint8_t target) {
+        fade_target = target << slowmotion_factor;
+        fade_state = target << slowmotion_factor;
+    }
+
+    void ShiftPWMProcessor::set_fade_target(uint8_t target) {
+        fade_target = target << slowmotion_factor;
+    }
+
+    void ShiftPWMProcessor::set_fade_speed(uint8_t speed) {
+        fade_increment = speed;
     }
     
     void ShiftPWMProcessor::clear() {

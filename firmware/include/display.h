@@ -40,6 +40,10 @@ namespace Display {
         };
 
         static void configure_mux(MUXMask mask);
+        
+        static void set_brightness(uint8_t target);
+        static void set_fade_target(uint8_t target);
+        static void set_fade_speed(uint8_t speed);
 
      private:
         static void blank();        
@@ -47,6 +51,8 @@ namespace Display {
         static void show_ones(uint8_t index);
         static void show_tens(uint8_t index);    
         static void show_nothing();
+
+        static constexpr uint8_t slowmotion_factor = 8;
     };
 
     class BufferControl {
