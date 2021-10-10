@@ -59,7 +59,6 @@ class Scheduler {
     // and implement some kind of global error display/handling
     static void start_relaxed() {
         // Now run main loop with non-critical tasks
-        // TODO: incorporate update_rate
         for(;;){            
             auto step_noncritical = []<typename T>(const T&) constexpr {
                 if constexpr (!T::critical) {

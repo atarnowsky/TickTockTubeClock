@@ -26,6 +26,27 @@
 //  - Various display-change effects
 
 
+
+class Demo : public RelaxedTask<5000> {
+  public:
+    static void initialize() {
+      Display::AntiCathodePoisoning::enable();  
+    }
+
+    static void process() {
+      static uint8_t cnt = 0;
+      if(cnt == 0) {
+        Display::AntiCathodePoisoning::disable();
+        Display::BufferControl::show_number(1.234f);  
+      }
+      else if(cnt == 1)
+        Display::AntiCathodePoisoning::enable();        
+      
+      cnt++;
+      if(cnt > 1) cnt = 0;
+    }
+};
+
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
   BaseLightDimmer,
@@ -34,7 +55,9 @@ using sched = Scheduler<8000,
   //RTCSync,
   //AmbientLight,
   SoundGenerator,
-  TimingBenchmark
+  TimingBenchmark,
+  Display::AntiCathodePoisoning,
+  Demo
 >;
 
 void setup() {    

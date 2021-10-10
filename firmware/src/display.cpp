@@ -22,20 +22,31 @@ namespace Display {
         { 0b00000000, 0b00000000, 0b00000000}  // Tens Blank / Tens Dot
     };
 
+    volatile ShiftPWMProcessor::MUXMask mux_mask = ShiftPWMProcessor::MUXMask::BOTH;
+
 
     // ShiftPWMProcessor ---
     void ShiftPWMProcessor::initialize(uint16_t update_rate) {
         clear(); // Clear registers to assure no random numbers show up on startup
     } 
 
-    void ShiftPWMProcessor::process(uint16_t cycle_count) {     
-
-        // Ghosting prevention: Put in a short blank frame between mux change 
-        if(cycle_count % 8 == 0) {
-            show_nothing();
+    void ShiftPWMProcessor::process(uint16_t cycle_count) {  
+        if(mux_mask == MUXMask::ONES) {
+            show_ones(0);
             return;
         }
 
+        if(mux_mask == MUXMask::TENS) {
+            show_tens(0);
+            return;
+        }
+        
+        // Ghosting prevention: Put in a short blank frame between mux change 
+        if(cycle_count % 8 == 0 || mux_mask == MUXMask::NONE) {
+            show_nothing();
+            return;
+        }
+    
         if(cycle_count < 8) 
             show_ones(0);
         else if (cycle_count < 16)
@@ -44,6 +55,12 @@ namespace Display {
             show_tens(2);
         else 
             show_tens(3);            
+    }
+
+    // Mainly used for AntiCathodePoisoning function, allowing
+    // to temporarily disable muxing
+    void ShiftPWMProcessor::configure_mux(MUXMask mask){
+        mux_mask = mask;
     }
     
     void ShiftPWMProcessor::clear() {
@@ -156,6 +173,36 @@ namespace Display {
         set_dots(dots(value));  
     }
 
+    void BufferControl::show_direct(const array<uint8_t, 4>& numbers, const array<bool, 4>& dots) {
+        // Clear complete buffer            
+        for(uint8_t i = 0; i < register_count; i++) {
+            register_buffers[0][i] = 0b00000000;
+            register_buffers[1][i] = 0b00000000;
+            register_buffers[2][i] = 0b00000000;
+            register_buffers[3][i] = 0b00000000;
+        }
+
+        for(uint8_t d = 0; d < numbers.size(); d++)
+        {
+            const bool dot = dots[d];
+            const uint8_t number = numbers[d];    
+            const uint8_t deci = d % 2; // 0 -> minutes/hours, 1 -> deciminutes/decihours
+            const uint8_t lr = d / 2;   // 0 -> right block,   1 -> left block
+            volatile auto& buf_a = register_buffers[deci*2];
+            volatile auto& buf_b = register_buffers[deci*2 + 1];
+            // Every number > 9 will be interpreted as blank
+            if(number < 10) {
+                buf_a[number_mapping[number][lr][0]] |= (1 << number_mapping[number][lr][1]);
+                buf_b[number_mapping[number][lr][0]] |= (1 << number_mapping[number][lr][1]);
+            }
+
+            if(dot) {
+                buf_a[dot_mapping[lr][0]] |= (1 << dot_mapping[lr][1]);
+                buf_b[dot_mapping[lr][0]] |= (1 << dot_mapping[lr][1]);
+            }
+        }
+    }
+
     void BufferControl::show_dots(const array<bool, 4>& dots)
     {  
         set_dots(dots);
@@ -215,6 +262,43 @@ namespace Display {
         static bool separator_visible = false;
         separator_visible = !separator_visible;        
         BufferControl::show_dots({false, separator_visible, false, false});                
+    }
+
+    // AntiCathodePoisoning ---
+
+    namespace {
+        bool acp_enabled = false;
+    }
+
+    void AntiCathodePoisoning::initialize() {
+
+    }
+
+    void AntiCathodePoisoning::process() {
+        static uint8_t i = 0;
+        static bool mux = false;
+        if(!acp_enabled) return;
+       
+        BufferControl::show_direct({i, i, i, i}, {i == 10, i == 11, i == 12, i == 13});
+        
+        if(++i > 13) {
+            i = 0;
+            mux = !mux;
+            if(mux)
+                ShiftPWMProcessor::configure_mux(ShiftPWMProcessor::MUXMask::ONES);
+            else
+                ShiftPWMProcessor::configure_mux(ShiftPWMProcessor::MUXMask::TENS);
+        }
+        
+    }
+
+    void AntiCathodePoisoning::enable() {
+        acp_enabled = true;
+    }
+
+    void AntiCathodePoisoning::disable() {
+        acp_enabled = false;
+        ShiftPWMProcessor::configure_mux(ShiftPWMProcessor::MUXMask::BOTH);
     }
 
 }

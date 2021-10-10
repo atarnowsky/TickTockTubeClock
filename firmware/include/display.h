@@ -32,6 +32,15 @@ namespace Display {
         static void initialize(uint16_t update_rate);
         static void process(uint16_t cycle_count);
 
+        enum class MUXMask {
+            NONE, 
+            ONES,
+            TENS,
+            BOTH
+        };
+
+        static void configure_mux(MUXMask mask);
+
      private:
         static void blank();        
         static void clear();        
@@ -44,6 +53,7 @@ namespace Display {
      public:
         static void show_time(uint16_t value);
         static void show_number(uint16_t value);
+        static void show_direct(const array<uint8_t, 4>& numbers, const array<bool, 4>& dots);
         static void show_number(float value);
         static void show_dots(const array<bool, 4>& dots = {false, false, false, false});
         static void clear();
@@ -57,5 +67,49 @@ namespace Display {
      public:
         static void initialize();
         static void process();
+    };
+
+
+    // === AntiCathodePoisoning (ACP) ===
+
+    // Tries to reduce cathode poisoning effects by cycling through
+    // all available numbers (often referred to as 'slot machine' effect).
+    // During these cycles, muxing is deactivated in order to allow
+    // the tubes to reach their full brightness.
+    // See [1] for more information wrt. cathode poisoning.
+
+    // There are many discussions on how effective this procedure is
+    // and how often it should be performed. It is also not clear how
+    // long each number should be lightened up to be effective.
+    // You may lower the 'acp_duration' (defaults to 10ms for now) 
+    // to make the effect less visually distracting.
+
+    // According to [2] (at least for a specific type of tube), the ratio
+    // between normal operation and cycling should be about 60:0.2 meaning
+    // if the clock runs for 24 hours, the refreshing phase should be about 
+    // 5 minutes FOR EACH DIGIT. Since we have to cycle between two individual
+    // pairs of tubes and cannot show the digits simultaneously, this adds
+    // up to a total of 110 minutes per day.
+    // This value seems to be a bit high, since we do not drive the tubes
+    // at their maximum brightness. Probably 30 minutes a day should be
+    // sufficient (???).
+
+    // For the CD81 tubes that are used in revA however, there is
+    // a report [3] that even without poisoning prevention this specific 
+    // type of tube may last for several years. So it is up to you to decide
+    // whether to enable ACP or not :-)
+
+    // References:
+    // [1]  http://www.tube-tester.com/sites/nixie/different/cathode%20poisoning/cathode-poisoning.htm
+    // [2]  https://docs.daliborfarny.com/documentation/cathode-poisoning-prevention-routine/
+    // [3]  https://www.youtube.com/watch?v=RwDEhyfa7OI - see comments section
+    
+    constexpr uint16_t acp_duration = 10; // [ms]
+    class AntiCathodePoisoning : public RelaxedTask<acp_duration> {
+     public:
+        static void initialize();
+        static void process();
+        static void enable();
+        static void disable();
     };
 }
