@@ -30,7 +30,7 @@ namespace Display {
     class ShiftPWMProcessor : public CriticalTask<32>  {
      public:
         static void initialize(uint16_t update_rate);
-        static void process(uint16_t cycle_count);
+        static void process(uint8_t cycle_count);
 
         enum class MUXMask {
             NONE, 

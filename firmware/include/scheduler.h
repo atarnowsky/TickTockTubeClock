@@ -35,10 +35,14 @@ class Scheduler {
             
             auto step_critical = []<typename T>(const T&) constexpr {
                 if constexpr (T::critical) {                    
-                    uint8_t& task_state = state_critical[auto_index_of<T, Tasks...>()];
-                    T::process(task_state++);
-                    if(task_state >= T::cycle_count) {
-                        task_state = 0;
+                    if constexpr (T::cycle_count == 0) {
+                        T::process();
+                    } else {
+                        uint8_t& task_state = state_critical[auto_index_of<T, Tasks...>()];
+                        T::process(task_state++);
+                        if(task_state >= T::cycle_count) {
+                            task_state = 0;
+                        }
                     }
                 }
             };            
@@ -59,12 +63,16 @@ class Scheduler {
         for(;;){            
             auto step_noncritical = []<typename T>(const T&) constexpr {
                 if constexpr (!T::critical) {
-                    uint32_t& task_time = state_relaxed[auto_index_of<T, Tasks...>()];
-                    uint32_t current_time = millis();                    
-                    if(current_time - task_time >= T::minimal_delay) {
-                        task_time = current_time;
+                    if constexpr (T::minimal_delay == 0) {
                         T::process();
-                    }                    
+                    } else {
+                        uint32_t& task_time = state_relaxed[auto_index_of<T, Tasks...>()];
+                        uint32_t current_time = millis();                    
+                        if(current_time - task_time >= T::minimal_delay) {
+                            task_time = current_time;
+                            T::process();
+                        }   
+                    }                 
                 }
             };
 
@@ -106,14 +114,14 @@ array<uint32_t, sizeof_relaxed<Tasks...>()> Scheduler<UpdateRateHerz, Tasks...>:
 #endif
 
 
-template<unsigned char round_trip>
+template<unsigned char round_trip = 0>
 class CriticalTask{    
   public:
     static constexpr bool critical = true;
     static constexpr uint8_t cycle_count = round_trip;
 };
 
-template<unsigned long desired_delay_ms>
+template<unsigned long desired_delay_ms = 0>
 class RelaxedTask{
   public:
     static constexpr bool critical = false;

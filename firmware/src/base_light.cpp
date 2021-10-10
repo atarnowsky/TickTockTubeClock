@@ -13,7 +13,7 @@ void BaseLightDimmer::initialize(uint16_t update_rate) {
     (void)update_rate; 
 }
 
-void BaseLightDimmer::process(uint16_t cycle_count) {
+void BaseLightDimmer::process(uint8_t cycle_count) {
     // TODO: Would be less flickery if we distribute
     // on and off states across the cycles...
     // Looks okay, as long as the cycle_count is not larger than 32
@@ -24,8 +24,8 @@ void BaseLightDimmer::process(uint16_t cycle_count) {
         fade_state -= fade_increment;
     
     
-    //                           16bit    ->       8bit        -> 0..31
-    const uint16_t pwm_width = fade_state >> slowmotion_factor >> 3;
+    //                                  16bit    ->       8bit        -> 0..31
+    const uint8_t pwm_width = uint8_t(fade_state >> slowmotion_factor >> 3);
 
     if(cycle_count < pwm_width) {
         IO::high(Pins::Light);

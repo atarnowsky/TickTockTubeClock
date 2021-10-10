@@ -36,7 +36,7 @@ namespace Display {
         clear(); // Clear registers to assure no random numbers show up on startup
     } 
 
-    void ShiftPWMProcessor::process(uint16_t cycle_count) {  
+    void ShiftPWMProcessor::process(uint8_t cycle_count) {  
         if(mux_mask == MUXMask::ONES) {
             show_ones(0);
             return;
@@ -61,8 +61,8 @@ namespace Display {
                 fade_state -= fade_increment;
         }
 
-        //                           16bit    ->       8bit        -> 0..31
-        const uint16_t pwm_width = fade_state >> slowmotion_factor >> 3;    
+        //                                  16bit    ->       8bit        -> 0..31
+        const uint8_t pwm_width = uint8_t(fade_state >> slowmotion_factor >> 3);    
 
         if(cycle_count % 8 > pwm_width) {
             show_nothing();

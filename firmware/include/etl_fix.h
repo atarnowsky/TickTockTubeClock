@@ -29,7 +29,21 @@ namespace internal {
             return 0;
         }
         else {
-            return (TSearch::critical == THead::critical ? 1 : 0) + resolve_index_of<TSearch, TTail...>();
+            if constexpr (TSearch::critical == THead::critical) {
+                if constexpr (TSearch::critical) {
+                    if constexpr (TSearch::cycle_count != 0)
+                        return 1 + resolve_index_of<TSearch, TTail...>();
+                    else 
+                        return resolve_index_of<TSearch, TTail...>();
+                } else {
+                    if constexpr (TSearch::minimal_delay != 0)
+                        return 1 + resolve_index_of<TSearch, TTail...>();
+                    else
+                        return resolve_index_of<TSearch, TTail...>();
+                }
+            } else {
+                return resolve_index_of<TSearch, TTail...>();
+            }            
         }
     }
 
@@ -40,9 +54,9 @@ namespace internal {
     {        
         if constexpr (THead::critical) {
             if constexpr (sizeof...(TTail) == 0)
-                return 1;
+                return (THead::cycle_count != 0 ? 1 : 0);
             else
-                return 1 + resolve_sizeof_critical<TTail...>();
+                return (THead::cycle_count != 0 ? 1 : 0) + resolve_sizeof_critical<TTail...>();
         }
         else {
             if constexpr (sizeof...(TTail) == 0)
@@ -55,17 +69,17 @@ namespace internal {
     template<typename THead, typename... TTail>
     constexpr size_t resolve_sizeof_relaxed()
     {        
-        if constexpr (THead::critical) {
+        if constexpr (!THead::critical) {
+            if constexpr (sizeof...(TTail) == 0)
+                return (THead::minimal_delay != 0 ? 1 : 0);
+            else
+                return (THead::minimal_delay != 0 ? 1 : 0) + resolve_sizeof_relaxed<TTail...>();
+        }
+        else {
             if constexpr (sizeof...(TTail) == 0)
                 return 0;
             else
                 return 0 + resolve_sizeof_relaxed<TTail...>();
-        }
-        else {
-            if constexpr (sizeof...(TTail) == 0)
-                return 1;
-            else
-                return 1 + resolve_sizeof_relaxed<TTail...>();
         }
     }
 }
