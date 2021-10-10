@@ -13,7 +13,7 @@
 // Safe state to EEPROM 8 times a day. This interval
 // should be save with respect to write cycles
 // (Should be about ~34 years without EEPROM failure)
-constexpr uint16_t every_three_hours = 3 * (60 * 60);
+constexpr uint32_t every_three_hours = 3UL * (60 * 60) * 1000;
 
 class RTCSync : public RelaxedTask<every_three_hours> {
  public:

@@ -34,11 +34,8 @@ class Scheduler {
             #endif
             
             auto step_critical = []<typename T>(const T&) constexpr {
-                if constexpr (T::critical) {
-                    // TODO: Using an 32bit value here is pretty inefficient, since 8bit normally would do it
-                    // This however, would make the state lookup way more complicated
-                    // (would need some 'count_critical' and 'index_of_critical' functions)
-                    uint32_t& task_state = state[index_of<T, Tasks...>()];
+                if constexpr (T::critical) {                    
+                    uint8_t& task_state = state_critical[auto_index_of<T, Tasks...>()];
                     T::process(task_state++);
                     if(task_state >= T::cycle_count) {
                         task_state = 0;
@@ -62,7 +59,7 @@ class Scheduler {
         for(;;){            
             auto step_noncritical = []<typename T>(const T&) constexpr {
                 if constexpr (!T::critical) {
-                    uint32_t& task_time = state[index_of<T, Tasks...>()];
+                    uint32_t& task_time = state_relaxed[auto_index_of<T, Tasks...>()];
                     uint32_t current_time = millis();                    
                     if(current_time - task_time >= T::minimal_delay) {
                         task_time = current_time;
@@ -84,16 +81,19 @@ class Scheduler {
 #endif
 
  private:
+    
     // Stores the internal "state" of each task.
-    // Depending whether the task is critical or not, the corresponding integer
-    // is interpreted differently:
-    //  - critical task: number of subsequent task calls, will be reset after 'cycle_count' has been reached
-    //  - non-critical task: hold the timestamp of the last call procession, so the task is only called ever 'minimal_delay' milliseconds
-    static array<uint32_t, sizeof...(Tasks)> state;
+    // For critical task: number of subsequent task calls, will be reset after 'cycle_count' has been reached
+    // For relaxed task: hold the timestamp of the last call procession, so the task is only called ever 'minimal_delay' milliseconds
+    static array<uint8_t, sizeof_critical<Tasks...>()> state_critical;
+    static array<uint32_t, sizeof_relaxed<Tasks...>()> state_relaxed;
 };
 
 template<int UpdateRateHerz, typename... Tasks>
-array<uint32_t, sizeof...(Tasks)> Scheduler<UpdateRateHerz, Tasks...>::state = {};
+array<uint8_t, sizeof_critical<Tasks...>()> Scheduler<UpdateRateHerz, Tasks...>::state_critical = {};
+
+template<int UpdateRateHerz, typename... Tasks>
+array<uint32_t, sizeof_relaxed<Tasks...>()> Scheduler<UpdateRateHerz, Tasks...>::state_relaxed = {};
 
 
 
@@ -106,20 +106,16 @@ array<uint32_t, sizeof...(Tasks)> Scheduler<UpdateRateHerz, Tasks...>::state = {
 #endif
 
 
-template<unsigned int round_trip>
-class CriticalTask{
-  private:
-    template<int UpdateRateHerz, typename... Tasks>
-    friend class Scheduler;
+template<unsigned char round_trip>
+class CriticalTask{    
+  public:
     static constexpr bool critical = true;
-    static constexpr uint16_t cycle_count = round_trip;
+    static constexpr uint8_t cycle_count = round_trip;
 };
 
-template<unsigned int desired_delay_ms>
+template<unsigned long desired_delay_ms>
 class RelaxedTask{
-  private:
-    template<int UpdateRateHerz, typename... Tasks>
-    friend class Scheduler;
+  public:
     static constexpr bool critical = false;
-    static constexpr uint16_t minimal_delay = desired_delay_ms;
+    static constexpr uint32_t minimal_delay = desired_delay_ms;
 };
