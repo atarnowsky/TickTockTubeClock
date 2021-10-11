@@ -13,6 +13,7 @@
 
 #include "scheduler.h"
 #include "benchmark.h"
+#include "effects.h"
 
 // Features that will be implemented in future releases:
 //  - Allow Display to control multiplexing (Alternating, AOnly, BOnly, Off)
@@ -27,20 +28,15 @@
 
 
 
-class Demo : public RelaxedTask<500> {
+class Demo : public RelaxedTask<5000> {
   public:
     static void initialize() {
-      Display::ShiftPWMProcessor::set_fade_speed(16);
+      Display::ShiftPWMProcessor::set_brightness(255);
+      Effects::Transition::set_effect(Effects::NumberTransition::FLICKER, 2500);
     }
 
     static void process() {
-      static bool dir = false;
-      dir = !dir;
-      if(dir)
-        Display::ShiftPWMProcessor::set_fade_target(0);
-      else
-        Display::ShiftPWMProcessor::set_fade_target(255);
-      
+      Effects::Transition::display(fastrand() * 9999);
     }
 };
 
@@ -52,8 +48,9 @@ using sched = Scheduler<8000,
   //RTCSync,
   //AmbientLight,
   SoundGenerator,
-  TimingBenchmark,
-  Display::AntiCathodePoisoning,
+  //TimingBenchmark,
+  //Display::AntiCathodePoisoning,
+  Effects::Transition,
   Demo
 >;
 

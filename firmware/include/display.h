@@ -45,6 +45,8 @@ namespace Display {
         static void set_fade_target(uint8_t target);
         static void set_fade_speed(uint8_t speed);
 
+        static volatile uint8_t& alter_buffer(uint8_t bank, uint8_t number);
+
      private:
         static void blank();        
         static void clear();        

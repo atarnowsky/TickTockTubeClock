@@ -36,6 +36,10 @@ namespace Display {
         clear(); // Clear registers to assure no random numbers show up on startup
     } 
 
+    volatile uint8_t& ShiftPWMProcessor::alter_buffer(uint8_t bank, uint8_t number) {
+        return register_buffers[number][bank];
+    }
+
     void ShiftPWMProcessor::process(uint8_t cycle_count) {  
         if(mux_mask == MUXMask::ONES) {
             show_ones(0);

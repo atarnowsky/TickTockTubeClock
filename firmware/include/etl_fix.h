@@ -98,12 +98,22 @@ constexpr size_t auto_index_of() {
 
 template<typename... Types>
 constexpr size_t sizeof_critical() {
-    return internal::resolve_sizeof_critical<Types...>() + 1;
+    return internal::resolve_sizeof_critical<Types...>() + 2;
 }
 
 
 
 template<typename... Types>
 constexpr size_t sizeof_relaxed() {
-    return internal::resolve_sizeof_relaxed<Types...>() + 1;
+    return internal::resolve_sizeof_relaxed<Types...>() + 2; // FIXME: Array is to small, but why?
 }
+
+
+// Intels fastrand
+// Found here: https://stackoverflow.com/questions/1640258/need-a-fast-random-generator-for-c
+
+inline float fastrand() { 
+  static uint32_t seed = 0;
+  seed = (214013*seed+2531011); 
+  return ((seed>>16)&0x7FFF)/float(0x7fff); 
+} 
