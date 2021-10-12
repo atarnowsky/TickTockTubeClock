@@ -28,15 +28,17 @@
 
 
 
-class Demo : public RelaxedTask<5000> {
+class Demo : public RelaxedTask<512> {
   public:
     static void initialize() {
       Display::ShiftPWMProcessor::set_brightness(255);
-      Effects::Transition::set_effect(Effects::NumberTransition::FLICKER, 2500);
+      Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 9);
     }
 
     static void process() {
-      Effects::Transition::display(fastrand() * 9999);
+      static uint16_t cnt = 0;
+      //Effects::Transition::display(fastrand(9999));
+      Effects::Transition::display(cnt++);
     }
 };
 

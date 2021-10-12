@@ -112,8 +112,18 @@ constexpr size_t sizeof_relaxed() {
 // Intels fastrand
 // Found here: https://stackoverflow.com/questions/1640258/need-a-fast-random-generator-for-c
 
-inline float fastrand() { 
+constexpr uint16_t FASTRAND_MAX = 0x7FFF;
+
+inline uint16_t fastrand() { 
   static uint32_t seed = 0;
   seed = (214013*seed+2531011); 
-  return ((seed>>16)&0x7FFF)/float(0x7fff); 
+  return ((seed>>16)&0x7FFF); 
+} 
+
+inline uint16_t fastrand_10() { 
+  return fastrand() >> 5; 
+} 
+
+inline uint16_t fastrand(uint16_t max) { 
+    return max * (fastrand()/float(FASTRAND_MAX));
 } 

@@ -40,6 +40,12 @@ namespace Display {
         return register_buffers[number][bank];
     }
 
+    void ShiftPWMProcessor::alter_buffer(const uint8_t (&new_buffer)[4][3]) {
+        for(uint8_t i = 0; i < register_count; i++)
+                for(uint8_t j = 0; j < 4; j++)
+                    register_buffers[j][i] = new_buffer[j][i];
+    }
+
     void ShiftPWMProcessor::process(uint8_t cycle_count) {  
         if(mux_mask == MUXMask::ONES) {
             show_ones(0);

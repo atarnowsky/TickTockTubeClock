@@ -23,7 +23,7 @@ namespace Effects {
             { 0b00000000, 0b00000000, 0b00000000}  // Tens Blank / Tens Dot
         };
 
-        uint16_t effect_duration = 500;
+        uint8_t effect_duration = 9;
         uint32_t effect_start = millis();
         NumberTransition effect_transition = NumberTransition::NONE;
         uint16_t effect_counter = 0;
@@ -34,25 +34,22 @@ namespace Effects {
     }
 
     void Transition::process() {
-        if(millis() - effect_start > effect_duration) 
+        uint16_t elapsed = millis() - effect_start;
+        if(elapsed > (uint16_t(1) << effect_duration)) 
             return; // Effect passed, nothing to do
 
         auto copy_next = [&]() {
-            for(uint8_t i = 0; i < register_count; i++)
-                for(uint8_t j = 0; j < 4; j++)
-                    Display::ShiftPWMProcessor::alter_buffer(i, j) = buffer_next[j][i];
+            Display::ShiftPWMProcessor::alter_buffer(buffer_next);
         };
 
         auto copy_last = [&]() {
-            for(uint8_t i = 0; i < register_count; i++)
-                for(uint8_t j = 0; j < 4; j++)
-                    Display::ShiftPWMProcessor::alter_buffer(i, j) = buffer_last[j][i];
+            Display::ShiftPWMProcessor::alter_buffer(buffer_last);
         };
 
-        auto copy_random = [&](const float& c) {
+        auto copy_random = [&](const uint16_t& c) {
             for(uint8_t i = 0; i < register_count; i++)
                 for(uint8_t j = 0; j < 4; j++) {
-                    if(fastrand() < c)
+                    if(fastrand_10() < c)
                         Display::ShiftPWMProcessor::alter_buffer(i, j) = buffer_next[j][i];
                     else 
                         Display::ShiftPWMProcessor::alter_buffer(i, j) = buffer_last[j][i];
@@ -70,7 +67,8 @@ namespace Effects {
             }
 
             case NumberTransition::FADE_BLACK: {   
-                float time_index = (millis() - effect_start)/float(effect_duration);
+                // TODO: Do not use floating point, use some fixed point cos approximation
+                float time_index = elapsed/float(1 << effect_duration);
                 float value = 0.5f * cosf(2.0f * 3.1416f * time_index) + 0.5f;                
                 if((effect_counter == 0) && (time_index >= 0.5f)) {
                     copy_next();
@@ -81,13 +79,21 @@ namespace Effects {
             }
 
             case NumberTransition::FADE_CROSS: {
+                uint16_t time_index = (uint32_t(elapsed) << 4) >> effect_duration;
+                if(time_index < effect_counter) {
+                    copy_last();
+                } else {
+                    copy_next();
+                }
 
+                ++effect_counter &= 0b1111;
                 break;
             }
 
             case NumberTransition::FLICKER: {
-                float time_index = (millis() - effect_start)/float(effect_duration);
+                uint16_t time_index = (uint32_t(elapsed) << 10) >> effect_duration;
                 copy_random(time_index);
+                delay(10); // Slow down a bit to make the effect more realistic
                 break;
             }
         }
@@ -149,7 +155,7 @@ namespace Effects {
         effect_start = millis();
     }
 
-    void Transition::set_effect(NumberTransition transition, uint16_t duration) {
+    void Transition::set_effect(NumberTransition transition, uint8_t duration) {
         effect_transition = transition;
         effect_duration = duration;
     }

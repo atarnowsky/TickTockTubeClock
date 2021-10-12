@@ -17,7 +17,7 @@ namespace Effects {
       static void process();
 
       static void display(uint16_t value, const array<bool, 4>& dots = {false, false, false, false});
-      static void set_effect(NumberTransition transition, uint16_t duration = 500);
+      static void set_effect(NumberTransition transition, uint8_t duration_shift = 9);
    };
 
 }
