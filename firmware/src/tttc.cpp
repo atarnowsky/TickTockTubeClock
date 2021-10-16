@@ -28,17 +28,19 @@
 
 
 
-class Demo : public RelaxedTask<512> {
+class Demo : public RelaxedTask<60000> {
   public:
     static void initialize() {
       Display::ShiftPWMProcessor::set_brightness(255);
-      Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 9);
+      Effects::Transition::set_effect(Effects::NumberTransition::FLICKER, 9);
+      Effects::Ambient::set_effect(Effects::AmbientEffect::DEFECTIVE);
+      Effects::Transition::display(fastrand(9999));
     }
 
     static void process() {
-      static uint16_t cnt = 0;
-      //Effects::Transition::display(fastrand(9999));
-      Effects::Transition::display(cnt++);
+      //static uint16_t cnt = 0;
+      Effects::Transition::display(fastrand(9999));
+      //Effects::Transition::display(cnt++);
     }
 };
 
@@ -53,6 +55,7 @@ using sched = Scheduler<8000,
   //TimingBenchmark,
   //Display::AntiCathodePoisoning,
   Effects::Transition,
+  Effects::Ambient,
   Demo
 >;
 

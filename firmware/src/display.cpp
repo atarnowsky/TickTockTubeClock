@@ -46,6 +46,12 @@ namespace Display {
                     register_buffers[j][i] = new_buffer[j][i];
     }
 
+    void ShiftPWMProcessor::get_buffer(uint8_t (&copy)[4][3]) {
+        for(uint8_t i = 0; i < register_count; i++)
+                for(uint8_t j = 0; j < 4; j++)
+                    copy[j][i] = register_buffers[j][i];
+    }
+
     void ShiftPWMProcessor::process(uint8_t cycle_count) {  
         if(mux_mask == MUXMask::ONES) {
             show_ones(0);

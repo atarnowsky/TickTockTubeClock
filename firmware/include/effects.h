@@ -11,13 +11,33 @@ namespace Effects {
       FLICKER
    };
 
+   enum class AmbientEffect {
+      NONE,
+      VARIANT,
+      CANDLE,
+      DEFECTIVE
+   };
+
    class Transition : public RelaxedTask<> {
-   public:
+    public:
       static void initialize();
       static void process();
 
       static void display(uint16_t value, const array<bool, 4>& dots = {false, false, false, false});
       static void set_effect(NumberTransition transition, uint8_t duration_shift = 9);
+      static uint16_t current_number();
+   };
+
+   class Ambient : public RelaxedTask<10> {
+    public:
+      static void initialize();
+      static void process();
+      
+      static void set_effect(AmbientEffect effect);
+
+    private:
+      static constexpr uint8_t max_variation = 230;
+
    };
 
 }

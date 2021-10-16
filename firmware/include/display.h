@@ -47,6 +47,7 @@ namespace Display {
 
         static volatile uint8_t& alter_buffer(uint8_t bank, uint8_t number);
         static void alter_buffer(const uint8_t (&new_buffer)[4][3]);
+        static void get_buffer(uint8_t (&copy)[4][3]);
 
      private:
         static void blank();        
