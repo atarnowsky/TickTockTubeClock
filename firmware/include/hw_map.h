@@ -8,6 +8,7 @@
 
 namespace Pins { 
     constexpr array<pin_t, 3> Buttons = {PIN_PD1, PIN_PD2, PIN_PD0};
+    //constexpr array<ppin_t, 3> Buttons = {1_D, 2_D, 0_D};
     constexpr ppin_t Speaker = 1_C;
     constexpr ppin_t Light = 0_C;
 
@@ -34,9 +35,8 @@ namespace Pins {
 }
 
 namespace Timings {
-    constexpr uint16_t button_short_press = 25;
-    constexpr uint16_t button_long_press = 2000;
-    constexpr uint16_t button_reset_press = 15000;
+    constexpr uint32_t button_long_press = 1000;
+    constexpr uint32_t button_reset_press = 10000;
 }
 
 

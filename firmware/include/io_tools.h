@@ -107,7 +107,7 @@ struct IO {
     static inline void configure(PINS const&... args) {
         return (configure_pin<MODE>(args), ...);
     }
-
+    
     // If given pins are declared as constexpr, the compiler
     // will optimize the ifs away!
 

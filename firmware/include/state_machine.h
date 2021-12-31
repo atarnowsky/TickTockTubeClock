@@ -1,6 +1,6 @@
 #pragma once
 
-#include <EasyButton.h>
+#include "button_manager.h"
 
 #include "scheduler.h"
 #include "hw_map.h"
@@ -40,20 +40,12 @@ class State {
 };
 
 template<typename... States>
-class StateMachine : public RelaxedTask<25> {
+class StateMachine : public RelaxedTask<50> {
  public:    
     static void initialize() {    
-        button_plus.begin();
-        button_plus.onPressed(on_plus_short);
-        button_plus.onPressedFor(Timings::button_long_press, on_plus_long);
-
-        button_minus.begin();
-        button_minus.onPressed(on_minus_short);
-        button_minus.onPressedFor(Timings::button_long_press, on_minus_long);
-
-        button_select.begin();
-        button_select.onPressed(on_select_short);
-        button_select.onPressedFor(Timings::button_long_press, on_select_long);
+        ButtonManager::configure([](){
+            timer = millis();
+        });
 
         current_state = 0;
         next_state = 0;
@@ -61,15 +53,15 @@ class StateMachine : public RelaxedTask<25> {
 
         // Always initialize first task
         call_nth<States...>(0, [](auto T){
-            decltype(T)::initialize();
+            using State = decltype(T);
+            ButtonManager::set_callbacks<State>();
+            State::initialize();
         });
     }
 
     static void process() {
-        button_plus.read();
-        button_minus.read();
-        button_select.read();   
-
+        ButtonManager::update();
+        
         // Select and initialize next task, if change occured
         if(current_state != next_state) {
             call_nth<States...>(current_state, [](auto T){
@@ -82,22 +74,15 @@ class StateMachine : public RelaxedTask<25> {
             current_state = next_state;
 
             call_nth<States...>(current_state, [](auto T){
-                decltype(T)::initialize();
+                using State = decltype(T);
+                ButtonManager::set_callbacks<State>();
+                State::initialize();
             });
         }
 
         // Process current state
         call_nth<States...>(current_state, [](auto T){
             decltype(T)::process();
-        });
-
-        // Check for buttons
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            if(button_select.pressedFor(Timings::button_reset_press)) {
-                State::on_select_reset();
-                timer = millis();
-            }         
         });
 
         // Check for timeout
@@ -122,81 +107,10 @@ class StateMachine : public RelaxedTask<25> {
     }
 
  private: 
-    static void on_plus_short() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_plus_short();
-            timer = millis();
-        });
-    };
-
-    static void on_plus_long() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_plus_long();
-            timer = millis();
-        });
-    };
-
-    static void on_minus_short() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_minus_short();
-            timer = millis();
-        });
-    };
-
-    static void on_minus_long() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_minus_long();
-            timer = millis();
-        });
-    };
-
-    static void on_select_short() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_select_short();
-            timer = millis();
-        });
-    };
-
-    static void on_select_long() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_select_long();
-            timer = millis();
-        });
-    };
-
-    static void on_select_reset() {
-        call_nth<States...>(current_state, [](auto T){
-            using State = decltype(T);
-            State::on_select_reset();
-            timer = millis();
-        });
-    };
-
-    // TODO: EasyButton eats up A LOT of RAM and Flash
-    // We need to implement our own, more efficient, version...
-    static EasyButton button_plus;
-    static EasyButton button_minus;
-    static EasyButton button_select;
-
     static uint8_t current_state;
     static uint8_t next_state;
     static uint32_t timer;
 };
-
-template<typename... States>
-EasyButton StateMachine<States...>::button_plus(Pins::Buttons[0]);
-
-template<typename... States>
-EasyButton StateMachine<States...>::button_minus(Pins::Buttons[1]);
-
-template<typename... States>
-EasyButton StateMachine<States...>::button_select(Pins::Buttons[2]);
 
 template<typename... States>
 uint8_t StateMachine<States...>::current_state(0);
