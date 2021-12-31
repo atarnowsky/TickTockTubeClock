@@ -37,6 +37,10 @@ class SoundGenerator : public RelaxedTask<1000> {
     static void error(uint8_t bits);
     static void ack(uint8_t times = 1);
 
+    static void ack_short();
+    static void ack_long();
+    static void ack_reset();
+
  private:
     static constexpr uint16_t speaker_resonant_frequency = 4000; // [Hz]
 };

@@ -101,6 +101,9 @@ namespace Effects {
     }
 
     void Transition::display(uint16_t value, const array<bool, 4>& dots) {
+        // TODO: This does not respect dots!
+        if(displayed_number == value) return;
+
         displayed_number = value;
 
         auto number = [](uint16_t n) -> array<uint8_t, 4> 

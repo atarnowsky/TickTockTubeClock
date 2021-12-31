@@ -33,6 +33,12 @@ namespace Pins {
     void setup();
 }
 
+namespace Timings {
+    constexpr uint16_t button_short_press = 25;
+    constexpr uint16_t button_long_press = 2000;
+    constexpr uint16_t button_reset_press = 15000;
+}
+
 
 template<typename... DATAs>
 void Pins::Shift::shift_out(DATAs... data){  

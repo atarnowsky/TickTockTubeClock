@@ -71,3 +71,21 @@ void SoundGenerator::ack(uint8_t times){
         delay(100);
     }
 }
+
+void SoundGenerator::ack_short(){
+    tone(Pins::Speaker.arduino_pin(), 2000, 50);
+}
+
+void SoundGenerator::ack_long() {
+    tone(Pins::Speaker.arduino_pin(), 2000, 50);
+    tone(Pins::Speaker.arduino_pin(), 4000, 50);
+}
+
+void SoundGenerator::ack_reset() {
+    tone(Pins::Speaker.arduino_pin(), 2000, 50);
+    tone(Pins::Speaker.arduino_pin(), 4000, 50);
+    for(uint8_t i = 0; i < 3; i++) {
+        tone(Pins::Speaker.arduino_pin(), 500, 500);
+        delay(100);
+    }
+}

@@ -115,14 +115,14 @@ array<uint32_t, sizeof_relaxed<Tasks...>()> Scheduler<UpdateRateHerz, Tasks...>:
 
 
 template<unsigned char round_trip = 0>
-class CriticalTask{    
+class CriticalTask {    
   public:
     static constexpr bool critical = true;
     static constexpr uint8_t cycle_count = round_trip;
 };
 
 template<unsigned long desired_delay_ms = 0>
-class RelaxedTask{
+class RelaxedTask {
   public:
     static constexpr bool critical = false;
     static constexpr uint32_t minimal_delay = desired_delay_ms;

@@ -109,6 +109,23 @@ constexpr size_t sizeof_relaxed() {
 }
 
 
+template <typename... Types, class Funct>
+constexpr void call_nth(uint8_t index, Funct&& fun)
+{
+    uint8_t counter = 0;
+    auto selector = [&](auto&& T) -> bool{
+        if(index == counter++) {
+            fun(T);
+            return false;
+        }
+        return true;
+    }; 
+    // TODO: This probably can be done in a more elegant way
+    // without needing to instanciate the class. (The impact shouldn't
+    // be that critical, though, since they are all pure static).
+    (selector(Types()) && ...);
+}
+
 // Intels fastrand
 // Found here: https://stackoverflow.com/questions/1640258/need-a-fast-random-generator-for-c
 

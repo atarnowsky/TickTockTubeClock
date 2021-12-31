@@ -1,91 +1,208 @@
 #pragma once
 
-#include <JC_Button.h>
+#include <EasyButton.h>
 
 #include "scheduler.h"
 #include "hw_map.h"
+#include "etl_fix.h"
 
-class StateMachine : public RelaxedTask<100> {
+
+template<uint8_t timeout_seconds = 0>
+class State {
  public:
-    static void initialize() {       
+    static constexpr uint32_t timeout = uint32_t(timeout_seconds) * 1000;
+
+    // Will be called exactly once when the State gets active
+    static void initialize() {}
+
+    // Will be called periodically as long as the active state stays
+    // the same. May trigger spontaneous State transistions.
+    static void process() {}
+
+    // May be used to write to EEPROM.
+    // May NOT be used to alter StateMachine!
+    static void finish() {}
+
+    // Event handlers - default to no-op
+    static void on_plus_short() {}
+    static void on_plus_long() {}
+    static void on_minus_short() {}
+    static void on_minus_long() {}
+    static void on_select_short() {}
+    static void on_select_long() {}
+
+    // Mainly used for the "reset to factory defaults" task
+    static void on_select_reset() {}
+
+    // Will be called once when no buttons have been
+    // pressed for the specified timeout
+    static void on_timeout() {}
+};
+
+template<typename... States>
+class StateMachine : public RelaxedTask<25> {
+ public:    
+    static void initialize() {    
         button_plus.begin();
+        button_plus.onPressed(on_plus_short);
+        button_plus.onPressedFor(Timings::button_long_press, on_plus_long);
+
         button_minus.begin();
+        button_minus.onPressed(on_minus_short);
+        button_minus.onPressedFor(Timings::button_long_press, on_minus_long);
+
         button_select.begin();
+        button_select.onPressed(on_select_short);
+        button_select.onPressedFor(Timings::button_long_press, on_select_long);
+
+        current_state = 0;
+        next_state = 0;
+        timer = millis();
+
+        // Always initialize first task
+        call_nth<States...>(0, [](auto T){
+            decltype(T)::initialize();
+        });
     }
 
     static void process() {
         button_plus.read();
         button_minus.read();
-        button_select.read();
-        
-        // if(button_select.pressedFor(500) && !long_plus) {
-        //     long_plus = true;
-        //     led_state = !led_state;
-        //     buzzer.ack(2);
-        //     if(led_state) {
-        //     //display.led_on();
-        //         buzzer.set_tick_tock(TickTockSound::BitoneClick);
-        //     } else {
-        //         //display.led_off();
-        //         buzzer.set_tick_tock(TickTockSound::None);
-        //     }
-        // }
+        button_select.read();   
 
-        // if(button_select.wasReleased()) {
-        //     long_plus = false;
-        // }
+        // Select and initialize next task, if change occured
+        if(current_state != next_state) {
+            call_nth<States...>(current_state, [](auto T){
+                decltype(T)::finish();
+            });
 
-        // if(button_select.wasPressed()) {
-        //     current_state++;
-        //     current_state = current_state % states;  
-        //     buzzer.ack();
-        //     wait_timer = 0;
-        // }
+            // Reset timeout
+            timer = millis();
 
-        // if(button_minus.wasPressed() && current_state == Time) {
-        //     increment_minutes();
-        //     buzzer.ack();
-        // }
+            current_state = next_state;
 
-        // if(button_plus.wasPressed() && current_state == Time) {
-        //     increment_hours();
-        //     buzzer.ack();
-        // }
+            call_nth<States...>(current_state, [](auto T){
+                decltype(T)::initialize();
+            });
+        }
 
-        // switch (current_state) {
-        //     case Time:
-        //         if(wait_timer == 0)
-        //             Display::BufferControl::show_time(current_time());
-        //     break;
+        // Process current state
+        call_nth<States...>(current_state, [](auto T){
+            decltype(T)::process();
+        });
 
-        //     case Temperature: {
-        //         if(wait_timer == 0){
-        //             float temperature = RTC.temperature() / 4.0f;
-        //             Display::BufferControl::show_number(temperature);
-        //         }
-        //     }    
-        //     break;
+        // Check for buttons
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            if(button_select.pressedFor(Timings::button_reset_press)) {
+                State::on_select_reset();
+                timer = millis();
+            }         
+        });
 
-        //     case LightMeter: {
-        //         if(wait_timer == 0) {
-        //             OPT3001 result = opt3001.readResult();  
-        //             Display::BufferControl::show_number(result.lux);
-        //         }
-        //     }
-        //     break;
+        // Check for timeout
+        if(timer > 0) {
+            uint32_t duration = millis() - timer;
+            call_nth<States...>(current_state, [&](auto T){
+                using State = decltype(T);
+                if(duration >= State::timeout) {
+                    State::on_timeout();
+                    timer = 0; // Only trigger once
+                }
+            });
+        }
+    }
 
-        //     default:
-        //         Display::BufferControl::clear();
-        //     break;
-        // }
+    template<class STATE>
+    static void next() {
+        static constexpr bool valid {(std::is_same<STATE, States>::value || ...)};
+        static_assert(valid, "State does not belong to current Statemachine configuration.");
+
+        next_state = uint8_t(index_of<STATE, States...>());
     }
 
  private: 
-    static Button button_plus;
-    static Button button_minus;
-    static Button button_select;
+    static void on_plus_short() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_plus_short();
+            timer = millis();
+        });
+    };
+
+    static void on_plus_long() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_plus_long();
+            timer = millis();
+        });
+    };
+
+    static void on_minus_short() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_minus_short();
+            timer = millis();
+        });
+    };
+
+    static void on_minus_long() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_minus_long();
+            timer = millis();
+        });
+    };
+
+    static void on_select_short() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_select_short();
+            timer = millis();
+        });
+    };
+
+    static void on_select_long() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_select_long();
+            timer = millis();
+        });
+    };
+
+    static void on_select_reset() {
+        call_nth<States...>(current_state, [](auto T){
+            using State = decltype(T);
+            State::on_select_reset();
+            timer = millis();
+        });
+    };
+
+    // TODO: EasyButton eats up A LOT of RAM and Flash
+    // We need to implement our own, more efficient, version...
+    static EasyButton button_plus;
+    static EasyButton button_minus;
+    static EasyButton button_select;
+
+    static uint8_t current_state;
+    static uint8_t next_state;
+    static uint32_t timer;
 };
 
-Button StateMachine::button_plus(Pins::Buttons[0]);
-Button StateMachine::button_minus(Pins::Buttons[1]);
-Button StateMachine::button_select(Pins::Buttons[2]);
+template<typename... States>
+EasyButton StateMachine<States...>::button_plus(Pins::Buttons[0]);
+
+template<typename... States>
+EasyButton StateMachine<States...>::button_minus(Pins::Buttons[1]);
+
+template<typename... States>
+EasyButton StateMachine<States...>::button_select(Pins::Buttons[2]);
+
+template<typename... States>
+uint8_t StateMachine<States...>::current_state(0);
+
+template<typename... States>
+uint8_t StateMachine<States...>::next_state(0);
+
+template<typename... States>
+uint32_t StateMachine<States...>::timer(millis());
