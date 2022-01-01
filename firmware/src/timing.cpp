@@ -2,6 +2,23 @@
 
 #include <DS3232RTC.h>
 
+// TODO: Using the RTC library is pretty (memory-) inefficient
+// since we are not using calendar functions at all.
+// Additionally, querying the current time via I2C from the RTC
+// directly every few seconds probably is easier than all this
+// implicit syncing mechanisms...
+
+namespace {
+    void set_time(int8_t minutes, int8_t hours) {
+        // We do not use any calendar functions so we
+        // can save some bytes of flash by NOT using all these TimeLib method.
+        // Let's assume we live in the year 1970:
+        time_t t = minutes * 60UL + hours * 3600UL;
+        RTC.set(t);
+        setTime(t);
+    }
+}
+
 void RTCSync::initialize() {
     bool needs_init = RTC.oscStopped(true);
     setSyncProvider(RTC.get);
@@ -10,24 +27,14 @@ void RTCSync::initialize() {
         return;
     }
 
-    if(needs_init) {
-        // Show error number '0001'        
-        time_t t;
-        tmElements_t tm;
-
-        tm.Year = CalendarYrToTm(2021);
-        tm.Month = 1;
-        tm.Day = 1;
-        tm.Hour = 0;
-        tm.Minute = 0;
-        tm.Second = 0;
-
-        t = makeTime(tm);
-        RTC.set(t);
-        setTime(t);
+    if(needs_init) {   
+        set_time(0, 0);
     }  
 
     setSyncInterval(10);
+
+    // Disable unused RTC features
+    RTC.squareWave(SQWAVE_NONE);
 }
 
 void RTCSync::process() {
@@ -36,16 +43,16 @@ void RTCSync::process() {
 
 uint16_t RTCSync::current_time() {
     time_t t = now();  
-    int minutes = minute(t);
-    int hours = hour(t);
+    int8_t minutes = minute(t);
+    int16_t hours = hour(t);
     return hours * 100 + minutes;
 }
 
 
 void RTCSync::increment_minutes(int8_t amount) {
     time_t t = now();  
-    int minutes = minute(t) + amount;  
-    int hours = hour(t);
+    int8_t minutes = minute(t) + amount;  
+    int8_t hours = hour(t);
     
     // Normalize time
     if(minutes > 59) {
@@ -64,23 +71,13 @@ void RTCSync::increment_minutes(int8_t amount) {
     if(hours < 0)
         hours += 24;
 
-    tmElements_t tm;
-
-    tm.Year = CalendarYrToTm(2021);
-    tm.Month = 1;
-    tm.Day = 1;
-    tm.Hour = hours;
-    tm.Minute = minutes;
-    tm.Second = 0;
-    t = makeTime(tm);
-    RTC.set(t);
-    setTime(t);
+    set_time(minutes, hours);
 }
 
 void RTCSync::increment_hours(int8_t amount) {
     time_t t = now();  
-    int minutes = minute(t);  
-    int hours = hour(t) + amount;  
+    int8_t minutes = minute(t);  
+    int8_t hours = hour(t) + amount;  
     
     // Normalize time
     if(hours > 23)
@@ -89,15 +86,5 @@ void RTCSync::increment_hours(int8_t amount) {
     if(hours < 0)
         hours += 24;
 
-    tmElements_t tm;
-
-    tm.Year = CalendarYrToTm(2021);
-    tm.Month = 1;
-    tm.Day = 1;
-    tm.Hour = hours;
-    tm.Minute = minutes;
-    tm.Second = 0;
-    t = makeTime(tm);
-    RTC.set(t);
-    setTime(t);
+    set_time(minutes, hours);
 }

@@ -4,14 +4,14 @@
 
 namespace Effects {
 
-   enum class NumberTransition {
+   enum class NumberTransition : uint8_t {
       NONE,
       FADE_BLACK,
       FADE_CROSS,
       FLICKER
    };
 
-   enum class AmbientEffect {
+   enum class AmbientEffect : uint8_t {
       NONE,
       VARIANT,
       CANDLE,
@@ -37,7 +37,6 @@ namespace Effects {
 
     private:
       static constexpr uint8_t max_variation = 230;
-
    };
 
 }

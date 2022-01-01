@@ -5,7 +5,7 @@
 
 using pin_t = uint8_t;
 
-enum class Port {
+enum class Port : uint8_t {
     C,
     D
 };

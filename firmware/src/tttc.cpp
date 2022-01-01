@@ -1,4 +1,5 @@
-#define BENCHMARK
+//#define BENCHMARK
+#include <Arduino.h>
 
 #include "io_tools.h"
 #include "hw_map.h"
@@ -9,7 +10,8 @@
 #include "timing.h"
 #include "base_light.h"
 
-#include "state_machine.h" 
+#include "state.h"
+#include "state_machine.h"  
 #include "scheduler.h"
 //#include "benchmark.h"
 #include "effects.h"
@@ -98,16 +100,16 @@ uint16_t TimeSet::cnt{0};
 
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
-  BaseLightDimmer,
-  UI,
   Display::SeparatorDot,
+  Display::AntiCathodePoisoning,
+  Effects::Transition,
+  Effects::Ambient,
+  BaseLightDimmer,    
   RTCSync,
   AmbientLight,
   SoundGenerator,
-  //TimingBenchmark,
-  Display::AntiCathodePoisoning,
-  Effects::Transition,
-  Effects::Ambient
+  UI
+  //TimingBenchmark  
 >;
 
 
@@ -119,7 +121,7 @@ void setup() {
 
   sched::initialize();
   
-  SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
+  //SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
   //Display::BufferControl::show_number(1.234f);
 
   //BaseLightDimmer::set_fade_speed(2);

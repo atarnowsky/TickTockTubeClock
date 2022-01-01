@@ -4,7 +4,6 @@
 #define ETL_NO_STL
 #include <etl/array.h>
 #include <etl/type_traits.h>
-#include <etl/utility.h>
 using namespace etl;
 
 // ETL does not include i.e. make_index_sequence, this library does:

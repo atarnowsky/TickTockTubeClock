@@ -32,7 +32,7 @@ namespace Display {
         static void initialize(uint16_t update_rate);
         static void process(uint8_t cycle_count);
 
-        enum class MUXMask {
+        enum class MUXMask : uint8_t {
             NONE, 
             ONES,
             TENS,

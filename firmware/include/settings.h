@@ -37,8 +37,8 @@ namespace Settings {
 
     SettingSet get() {
         SettingSet result;
-        etl::array<uint8_t, static_cast<uint8_t>(Setting::FIRST_START)>& raw =
-            reinterpret_cast<etl::array<uint8_t, static_cast<uint8_t>(Setting::FIRST_START)>&>(result);
+        array<uint8_t, static_cast<uint8_t>(Setting::FIRST_START)>& raw =
+            reinterpret_cast<array<uint8_t, static_cast<uint8_t>(Setting::FIRST_START)>&>(result);
 
         // Assure the reinterpret cast actually is allowed.
         // Unfortunately, ArxTypeTraits does not support is_standard_layout, yet.
