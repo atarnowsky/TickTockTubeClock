@@ -13,8 +13,8 @@ public:
     //      - Effects (Crossfade, Stationary)
     //      - Base light brightness
     SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
-    Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 9);
-    Effects::Ambient::set_effect(Effects::AmbientEffect::VARIANT);  
+    Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 11);
+    Effects::Ambient::set_effect(Effects::AmbientEffect::CANDLE);  
     
     Display::ShiftPWMProcessor::set_brightness(255); // Move to loop        
   }

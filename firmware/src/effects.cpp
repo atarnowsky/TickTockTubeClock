@@ -293,8 +293,7 @@ namespace Effects {
     }
       
     void Ambient::set_effect(AmbientEffect effect) {
-        ambient_effect = effect;
-        
+        ambient_effect = effect;        
     }
     
 } // namespace Effects
