@@ -23,7 +23,7 @@ namespace Effects {
       static void initialize();
       static void process();
 
-      static void display(uint16_t value, const array<bool, 4>& dots = {false, false, false, false});
+      static void display(uint8_t hours, uint8_t minutes, const array<bool, 4>& dots = {false, false, false, false});
       static void set_effect(NumberTransition transition, uint8_t duration_shift = 9);
       static uint16_t current_number();
    };

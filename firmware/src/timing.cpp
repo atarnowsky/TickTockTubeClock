@@ -15,8 +15,9 @@
 // implicit syncing mechanisms...
 
 namespace {
-    void set_time(int8_t minutes, int8_t hours) {      
+    time_pair last_query;
 
+    void set_time(int8_t minutes, int8_t hours) {      
         #ifdef USE_INTERNAL_LIB
             DS3232M::set_time({hours, minutes});
         #else
@@ -54,19 +55,17 @@ void RTCSync::initialize() {
 }
 
 void RTCSync::process() {
-    // TODO:: Backup Date and Time to EEPROM and load it on initializtion
-}
-
-uint16_t RTCSync::current_time() {
     #ifdef USE_INTERNAL_LIB
         DS3232M::time_t t = DS3232M::time();
-        return int16_t(t.hours)*100 + t.minutes;
+        last_query = {uint8_t(t.hours), uint8_t(t.minutes)};
     #else
         time_t t = now();  
-        int8_t minutes = minute(t);
-        int16_t hours = hour(t);
-        return hours * 100 + minutes;
+        last_query = {uint8_t(hour(t)), uint8_t(minute(t))};
     #endif    
+}
+
+time_pair RTCSync::current_time() {
+    return last_query;   
 }
 
 
@@ -99,6 +98,7 @@ void RTCSync::increment_minutes(int8_t amount) {
         hours += 24;
 
     set_time(minutes, hours);
+    process(); // Actualize internal timer
 }
 
 void RTCSync::increment_hours(int8_t amount) {
@@ -120,4 +120,5 @@ void RTCSync::increment_hours(int8_t amount) {
         hours += 24;
 
     set_time(minutes, hours);
+    process(); // Actualize internal timer
 }

@@ -34,73 +34,16 @@ using UI = StateMachine<
   TimeSet
 >;
 
-class Clock : public State<50>{
-public:
-  static uint16_t cnt;
-  static void on_plus_short() {
-    SoundGenerator::ack_short();
-    cnt += 1;
-  }
-  static void on_plus_long() {
-    SoundGenerator::ack_long();
-    cnt += 100;
-  }
+// Yes, its pretty ugly to use UI within the following header files.
+// This seriously needs some cleanup...
+#include "state_clock.h"
+#include "state_timeset.h"
 
-  static void on_select_reset() {
-    SoundGenerator::ack_reset();
-    cnt = 0;
-  }
-
-  static void on_select_short() {
-    UI::next<TimeSet>();
-  }
-
-  static void initialize() {
-    cnt = 1234;
-    Display::ShiftPWMProcessor::set_brightness(255);
-    Effects::Transition::set_effect(Effects::NumberTransition::FLICKER, 9);
-    Effects::Ambient::set_effect(Effects::AmbientEffect::DEFECTIVE);      
-  }
-
-  static void process() {
-    Effects::Transition::display(cnt);
-  }
-
-  static void on_timeout() {
-    cnt = 8888;
-  }
-
-};
-
-uint16_t Clock::cnt{0};
-
-class TimeSet : public State<0>{
-public:
-  static uint16_t cnt;
-
-  static void initialize() {
-    cnt = 0;
-    Display::ShiftPWMProcessor::set_brightness(64);
-    Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 9);
-    Effects::Ambient::set_effect(Effects::AmbientEffect::CANDLE);      
-  }
-
-  static void process() {
-    Effects::Transition::display(cnt);
-    cnt++;
-    cnt *= 1.1;
-    if(cnt >= 9999) {
-      UI::next<Clock>();
-    }
-  }
-};
-
-uint16_t TimeSet::cnt{0};
 
 
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
-  Display::SeparatorDot,
+  //Display::SeparatorDot,
   Display::AntiCathodePoisoning,
   Effects::Transition,
   Effects::Ambient,
@@ -111,7 +54,6 @@ using sched = Scheduler<8000,
   UI
   //TimingBenchmark  
 >;
-
 
 
 void setup() {    

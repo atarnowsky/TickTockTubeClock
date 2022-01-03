@@ -100,7 +100,8 @@ namespace DS3232M {
         Wire.write(util::to_bcd(time.minutes)); 
         Wire.write(util::to_bcd(time.hours)); 
         for(uint8_t i = 0; i < 4; i++)
-            Wire.write(0);   
+            Wire.write(1);   
+        Wire.endTransmission();
     }
 
 }

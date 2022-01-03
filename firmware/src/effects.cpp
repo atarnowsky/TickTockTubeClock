@@ -27,7 +27,8 @@ namespace Effects {
         uint32_t effect_start = millis();
         NumberTransition effect_transition = NumberTransition::NONE;
         uint16_t effect_counter = 0;
-        uint16_t displayed_number = 0;
+        uint8_t displayed_hours = 0;
+        uint8_t displayed_minutes = 0;
     }
 
     void Transition::initialize() {
@@ -100,20 +101,31 @@ namespace Effects {
         }        
     }
 
-    void Transition::display(uint16_t value, const array<bool, 4>& dots) {
+    void Transition::display(uint8_t hours, uint8_t minutes, const array<bool, 4>& dots) {
         // TODO: This does not respect dots!
-        if(displayed_number == value) return;
+        if((displayed_hours == hours) && (displayed_minutes == minutes)) return;
 
-        displayed_number = value;
+        displayed_hours = hours;
+        displayed_minutes = minutes;
 
-        auto number = [](uint16_t n) -> array<uint8_t, 4> 
-        {
-            if(n > 9999) return {255, 255, 255, 255};
+        auto number = [](uint8_t h, uint8_t m) -> array<uint8_t, 4> 
+        {            
             array<uint8_t, 4>  result;
-            result[3] = (n / 1000) % 10;
-            result[2] = (n / 100) % 10;
-            result[1] = (n / 10) % 10;
-            result[0] = n % 10;
+            result[3] = (h / 10) % 10;
+            result[2] = h % 10;
+            result[1] = (m / 10) % 10;
+            result[0] = m % 10;
+
+            if(h > 99) {
+                result[3] = 255;
+                result[2] = 255;
+            }
+
+            if(m > 99) {
+                result[1] = 255;
+                result[0] = 255;
+            }
+
             return result;
         };
 
@@ -131,7 +143,7 @@ namespace Effects {
             buffer_next[3][i] = 0b00000000;
         }
 
-        array<uint8_t, 4> numbers = number(value);
+        array<uint8_t, 4> numbers = number(hours, minutes);
 
         for(uint8_t d = 0; d < numbers.size(); d++)
         {
@@ -164,7 +176,7 @@ namespace Effects {
     }
 
     uint16_t Transition::current_number() {
-        return displayed_number;
+        return uint16_t(displayed_hours) * 100+ displayed_minutes;
     }
 
 

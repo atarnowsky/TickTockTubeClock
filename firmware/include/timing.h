@@ -2,25 +2,22 @@
 
 #include "scheduler.h"
 
-// Missing features:
-//  - Proper integration with scheduler
-//  - 12/24 hour mode
-//  - Alarm timer
-//  - Error display
-//  - Calendar support
-//  - Periodic EEPROM backup for calendar to reduce user effort on power loss
+struct time_pair {
+    uint8_t hours = 0;
+    uint8_t minutes = 0;
+};
 
-// Safe state to EEPROM 8 times a day. This interval
-// should be save with respect to write cycles
-// (Should be about ~34 years without EEPROM failure)
-constexpr uint32_t every_three_hours = 3UL * (60 * 60) * 1000;
-
-class RTCSync : public RelaxedTask<every_three_hours> {
+// This task allows to access the RTC by increasing/decreasing the
+// relative time (no absolute time setting needed for now...)
+// Once a second, the time gets read out via I2C, so current_time
+// might be queried without introducing additional overhead
+class RTCSync : public RelaxedTask<1000> {
  public:
     static void initialize();
     static void process();
 
-    static uint16_t current_time();    
+    // Returns the current time as a single 4-digit number
+    static time_pair current_time();    
     static void increment_minutes(int8_t amount = 1);
     static void increment_hours(int8_t amount = 1);
 };
