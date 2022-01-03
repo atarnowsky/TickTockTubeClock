@@ -3,8 +3,9 @@
 #include "scheduler.h"
 
 struct time_pair {
-    uint8_t hours = 0;
-    uint8_t minutes = 0;
+    int8_t hours = 0;
+    int8_t minutes = 0;
+    void normalize();
 };
 
 // This task allows to access the RTC by increasing/decreasing the

@@ -1,5 +1,6 @@
 #pragma once
 #include <Wire.h>
+#include "timing.h"
 // This is an absolute minimal interface to the RS3232M RTC IC.
 // For generale usage, I highly recommend a properly implemented
 // library like Jack Christensen's DS3232RTC Library
@@ -16,11 +17,6 @@ namespace DS3232M {
         OKAY,
         I2C_ERROR,
         OSCILLATOR_FAILURE
-    };
-
-    struct time_t {
-        int8_t hours;
-        int8_t minutes;
     };
 
     namespace util {
@@ -75,7 +71,7 @@ namespace DS3232M {
         return util::read(0x11);
     }
 
-    inline time_t time() {
+    inline time_pair time() {
         Wire.beginTransmission(0x68);
         Wire.write(0x00);
         uint8_t error = Wire.endTransmission();
@@ -83,7 +79,7 @@ namespace DS3232M {
             return {0, 0};
         }
         Wire.requestFrom(0x68, 7);
-        time_t result;
+        time_pair result;
         (void)Wire.read(); // Ignore seconds
         result.minutes = util::decode_bcd(Wire.read());
         result.hours = util::decode_bcd(Wire.read() & ~(1 << 6));
@@ -93,7 +89,7 @@ namespace DS3232M {
         return result;
     }
 
-    inline void set_time(const time_t& time) {
+    inline void set_time(const time_pair& time) {
         Wire.beginTransmission(0x68);
         Wire.write(0x00);
         Wire.write(0); // seconds
