@@ -7,6 +7,12 @@
 class Clock : public State<0>{
 public:
   static void initialize() {
+    BaseLightDimmer::set_fade_target(Settings::get(Setting::LED_BRIGHTNESS));
+    uint8_t tube_brightness = Settings::get(Setting::TUBE_BRIGHTNESS);
+    Display::ShiftPWMProcessor::set_brightness(tube_brightness); // Move to loop  
+    Effects::Transition::set_max_brightness(tube_brightness);
+    Effects::Ambient::set_max_brightness(tube_brightness);
+
     // Load settings from EEPROM
     // Set non-dynamic modules
     //      - Tick Sound
@@ -15,8 +21,6 @@ public:
     SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
     Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 11);
     Effects::Ambient::set_effect(Effects::AmbientEffect::CANDLE);  
-    
-    Display::ShiftPWMProcessor::set_brightness(255); // Move to loop        
   }
 
   static void process() {
@@ -46,6 +50,6 @@ public:
   }
 
   static void on_select_long() {
-    //UI::next<Setup>();
+    UI::next<SettingInit>();
   }
 };

@@ -31,8 +31,15 @@ namespace Effects {
         uint8_t displayed_minutes = 0;
     }
 
+    uint8_t Transition::max_brightness = 255;
+    uint8_t Ambient::max_brightness = 255;
+    
     void Transition::initialize() {
 
+    }
+
+    void Transition::set_max_brightness(uint8_t brightness) {
+        max_brightness = brightness;
     }
 
     void Transition::process() {
@@ -76,7 +83,7 @@ namespace Effects {
                     copy_next();
                     effect_counter++;
                 }
-                Display::ShiftPWMProcessor::set_brightness(255 * value);
+                Display::ShiftPWMProcessor::set_brightness(max_brightness * value);
                 break;
             }
 
@@ -99,6 +106,10 @@ namespace Effects {
                 break;
             }
         }        
+    }
+
+    void Transition::display(uint16_t value) {
+        display(value/100, value%100);
     }
 
     void Transition::display(uint8_t hours, uint8_t minutes, const array<bool, 4>& dots) {
@@ -210,7 +221,10 @@ namespace Effects {
 
                 Display::ShiftPWMProcessor::set_fade_speed(10);
                 const uint8_t target = fastrand(255);
-                Display::ShiftPWMProcessor::set_fade_target(target); 
+                if(target < max_brightness)
+                    Display::ShiftPWMProcessor::set_fade_target(target); 
+                else 
+                    Display::ShiftPWMProcessor::set_fade_target(max_brightness); 
                 ambient_counter = 0;           
                 break;
             }
@@ -219,7 +233,8 @@ namespace Effects {
                 if(ambient_counter < timer_threshold) break;
 
                 Display::ShiftPWMProcessor::set_fade_speed(4);
-                const uint8_t target = fastrand_sq(max_variation) + (255 - max_variation);
+                const uint16_t variation = (uint16_t(max_variation) * max_brightness)/255;
+                const uint8_t target = (uint16_t(max_brightness) * (fastrand_sq(variation) + (255 - variation)))/255;
                 Display::ShiftPWMProcessor::set_fade_target(target); 
                 ambient_counter = 0;    
                 timer_threshold = fastrand(500);       
@@ -290,6 +305,10 @@ namespace Effects {
 
 
         ambient_counter++; // 10ms increments
+    }
+
+    void Ambient::set_max_brightness(uint8_t brightness) {
+        max_brightness = brightness;
     }
       
     void Ambient::set_effect(AmbientEffect effect) {

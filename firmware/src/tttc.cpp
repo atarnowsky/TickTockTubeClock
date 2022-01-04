@@ -28,16 +28,23 @@
 
 class Clock;
 class TimeSet;
+class SettingInit;
+class SettingLEDBrightness;
+class SettingTubeBrightness;
 
 using UI = StateMachine<
   Clock,       // Index 0 automatically denotes the initial State to run
-  TimeSet
+  TimeSet,
+  SettingInit,
+  SettingLEDBrightness,
+  SettingTubeBrightness
 >;
 
 // Yes, its pretty ugly to use UI within the following header files.
 // This seriously needs some cleanup...
 #include "state_clock.h"
 #include "state_timeset.h"
+#include "state_settings.h"
 
 
 
@@ -58,6 +65,9 @@ using sched = Scheduler<8000,
 
 void setup() {    
   Pins::setup();  
+  
+  BaseLightDimmer::set_fade_speed(2);
+  BaseLightDimmer::set_brightness(0);
 
   //TimingBenchmark::setup(&sched::benchmark_micros_total, &sched::benchmark_counts);
 
@@ -66,8 +76,6 @@ void setup() {
   //SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
   //Display::BufferControl::show_number(1.234f);
 
-  //BaseLightDimmer::set_fade_speed(2);
-  //BaseLightDimmer::set_fade_target(64);
 
   sched::start_critical();
   sched::start_relaxed();
