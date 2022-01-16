@@ -77,6 +77,8 @@ namespace Display {
      public:
         static void initialize();
         static void process();
+        static void enable();
+        static void disable();
     };
 
 

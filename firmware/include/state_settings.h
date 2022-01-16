@@ -38,6 +38,7 @@ public:
     Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
     SoundGenerator::ack_long();
     UI::next<SettingLEDBrightness>();
+    Display::SeparatorDot::disable();
   }
 };
 

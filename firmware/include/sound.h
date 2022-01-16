@@ -2,7 +2,9 @@
 #pragma once
 
 #include "scheduler.h"
+#include "hw_map.h"
 
+using Note = array<uint16_t, 3>;
 
 enum class TickTockSound : uint8_t {
     None = 0,
@@ -26,6 +28,19 @@ class SoundGenerator : public RelaxedTask<1000> {
     static void ack_short();
     static void ack_long();
     static void ack_reset();
+
+
+    template<typename... Seq>
+    inline static void play_sequence(Seq... sequence) {
+        auto note = [](const Note& n) {
+            tone(Pins::Speaker.arduino_pin(), n[0], n[1]);
+            delay(n[1]);
+            noTone(Pins::Speaker.arduino_pin());
+            delay(n[2]);
+        };
+
+        (play_sequence(sequence), ...);
+    }
 
  private:
     static constexpr uint16_t speaker_resonant_frequency = 4000; // [Hz]

@@ -306,14 +306,31 @@ namespace Display {
     }
 
     // SeparatorDot ---
+
+    namespace
+    {
+        bool dot_enabled = false;
+        bool separator_visible = false;
+    } 
+    
+
     void SeparatorDot::initialize() {
 
     }
 
     void SeparatorDot::process() {
-        static bool separator_visible = false;
-        separator_visible = !separator_visible;        
-        BufferControl::show_dots({false, separator_visible, false, false});                
+        separator_visible = !separator_visible;  
+        if(dot_enabled) {
+            BufferControl::show_dots({false, false, separator_visible, false});                
+        }
+    }
+
+    void SeparatorDot::enable() {
+        dot_enabled = true;
+    }
+    
+    void SeparatorDot::disable() {
+        dot_enabled = false;
     }
 
     // AntiCathodePoisoning ---

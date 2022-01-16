@@ -12,6 +12,7 @@ public:
     Display::ShiftPWMProcessor::set_brightness(tube_brightness); // Move to loop  
     Effects::Transition::set_max_brightness(tube_brightness);
     Effects::Ambient::set_max_brightness(tube_brightness);
+    Display::SeparatorDot::enable();
 
     // Load settings from EEPROM
     // Set non-dynamic modules

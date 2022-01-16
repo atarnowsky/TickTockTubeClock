@@ -3,11 +3,10 @@
 
 namespace {
     TickTockSound tick_tock = TickTockSound::None;
-    //AlarmSound SoundGenerator::alarm_sound = AlarmSound::DoubleHigh;
 }
 
-void SoundGenerator::initialize() {
-    
+void SoundGenerator::initialize() {    
+   
 }
 
 void SoundGenerator::process(){

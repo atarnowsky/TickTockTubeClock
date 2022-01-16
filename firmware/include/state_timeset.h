@@ -14,6 +14,7 @@ public:
     Display::ShiftPWMProcessor::set_brightness(255);
     Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 7);
     Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
+    Display::SeparatorDot::disable();
 
     timer = millis();  
     hours = false;

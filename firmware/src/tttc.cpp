@@ -50,7 +50,7 @@ using UI = StateMachine<
 
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
-  //Display::SeparatorDot,
+  Display::SeparatorDot,
   Display::AntiCathodePoisoning,
   Effects::Transition,
   Effects::Ambient,
@@ -65,6 +65,13 @@ using sched = Scheduler<8000,
 
 void setup() {    
   Pins::setup();  
+
+  // SoundGenerator::play_sequence(
+  //     Note{659, 100, 75*3},
+  //     Note{523, 100, 75},
+  //     Note{659, 100, 75},
+  //     Note{880, 200, 75}
+  // );
   
   BaseLightDimmer::set_fade_speed(2);
   BaseLightDimmer::set_brightness(0);
