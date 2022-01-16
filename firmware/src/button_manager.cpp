@@ -65,7 +65,7 @@ void ButtonManager::update() {
             callback_reset();
             callback_always();
             current = 254;
-        } else {
+        } else if (current != 2) {
             if(elapsed > Timings::button_long_press) {
                 callbacks_long[current]();
                 callback_always();

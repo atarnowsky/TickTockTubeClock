@@ -2,6 +2,7 @@
 
 #include "state.h"
 #include "timing.h"
+#include "settings.h"
 
 
 class Clock : public State<0>{
@@ -42,7 +43,15 @@ public:
 
   static void on_select_reset() {
     SoundGenerator::ack_reset();
-    // TODO: Initiate reset
+    Settings::reset();
+    Display::SeparatorDot::disable();
+    SoundGenerator::set_tick_tock(TickTockSound::None);
+    RTCSync::reset();
+    
+    // Stop program completely:
+    cli();
+    IO::low(Pins::Anode::MuxA, Pins::Anode::MuxB); 
+    for(;;);
   }
 
   static void on_select_short() {

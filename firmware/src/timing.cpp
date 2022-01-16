@@ -49,3 +49,9 @@ void RTCSync::increment_hours(int8_t amount) {
     DS3232M::set_time(t);
     process(); // Actualize internal timer
 }
+
+void RTCSync::reset() {
+    time_pair t;
+    DS3232M::set_time(t);
+    process(); // Actualize internal timer
+}

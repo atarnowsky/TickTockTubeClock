@@ -65,23 +65,19 @@ using sched = Scheduler<8000,
 
 void setup() {    
   Pins::setup();  
-
-  // SoundGenerator::play_sequence(
-  //     Note{659, 100, 75*3},
-  //     Note{523, 100, 75},
-  //     Note{659, 100, 75},
-  //     Note{880, 200, 75}
-  // );
   
   BaseLightDimmer::set_fade_speed(2);
   BaseLightDimmer::set_brightness(0);
 
-  //TimingBenchmark::setup(&sched::benchmark_micros_total, &sched::benchmark_counts);
-
   sched::initialize();
   
-  //SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
-  //Display::BufferControl::show_number(1.234f);
+
+  if(Settings::on_first_start()) {
+    SoundGenerator::play(Note{659, 100, 75*3});
+    SoundGenerator::play(Note{523, 100, 75});
+    SoundGenerator::play(Note{659, 100, 75});
+    SoundGenerator::play(Note{880, 200, 75});
+  }  
 
 
   sched::start_critical();

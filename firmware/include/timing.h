@@ -21,6 +21,7 @@ class RTCSync : public RelaxedTask<1000> {
     static time_pair current_time();    
     static void increment_minutes(int8_t amount = 1);
     static void increment_hours(int8_t amount = 1);
+    static void reset();
 };
 
 

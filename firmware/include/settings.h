@@ -51,4 +51,19 @@ namespace Settings {
 
         return result;
     }
+
+    bool on_first_start() {
+        if(get(Setting::FIRST_START) == 1) {
+            set(Setting::FIRST_START, 0);
+            return true;
+        }
+        return false;        
+    }
+
+    void reset() {
+        set(Setting::FIRST_START, 1);
+        set(Setting::LED_BRIGHTNESS, 32);
+        set(Setting::TUBE_BRIGHTNESS, 255);
+        set(Setting::TICK_SOUND, 1);        
+    }
 }

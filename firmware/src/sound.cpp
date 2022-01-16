@@ -94,3 +94,10 @@ void SoundGenerator::ack_reset() {
         delay(500);
     }
 }
+
+void SoundGenerator::play(const Note& n) {
+    tone(Pins::Speaker.arduino_pin(), n[0], n[1]);
+    delay(n[1]);
+    noTone(Pins::Speaker.arduino_pin());
+    delay(n[2]);
+}

@@ -27,8 +27,8 @@ namespace Effects {
         uint32_t effect_start = millis();
         NumberTransition effect_transition = NumberTransition::NONE;
         uint16_t effect_counter = 0;
-        uint8_t displayed_hours = 0;
-        uint8_t displayed_minutes = 0;
+        uint8_t displayed_hours = 255;
+        uint8_t displayed_minutes = 255;
     }
 
     uint8_t Transition::max_brightness = 255;

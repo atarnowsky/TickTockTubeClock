@@ -29,18 +29,7 @@ class SoundGenerator : public RelaxedTask<1000> {
     static void ack_long();
     static void ack_reset();
 
-
-    template<typename... Seq>
-    inline static void play_sequence(Seq... sequence) {
-        auto note = [](const Note& n) {
-            tone(Pins::Speaker.arduino_pin(), n[0], n[1]);
-            delay(n[1]);
-            noTone(Pins::Speaker.arduino_pin());
-            delay(n[2]);
-        };
-
-        (play_sequence(sequence), ...);
-    }
+    static void play(const Note& n);
 
  private:
     static constexpr uint16_t speaker_resonant_frequency = 4000; // [Hz]
