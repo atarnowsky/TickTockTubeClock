@@ -11,15 +11,14 @@ public:
     uint8_t tube_brightness = Settings::get(Setting::TUBE_BRIGHTNESS);
     Display::ShiftPWMProcessor::set_brightness(tube_brightness); // Move to loop  
     Effects::Transition::set_max_brightness(tube_brightness);
-    Effects::Ambient::set_max_brightness(tube_brightness);
+    Effects::Ambient::set_max_brightness(tube_brightness);    
+    SoundGenerator::set_tick_tock(static_cast<TickTockSound>(Settings::get(Setting::TICK_SOUND)));
     Display::SeparatorDot::enable();
 
     // Load settings from EEPROM
-    // Set non-dynamic modules
-    //      - Tick Sound
+    // Set non-dynamic modules    
     //      - Effects (Crossfade, Stationary)
-    //      - Base light brightness
-    SoundGenerator::set_tick_tock(TickTockSound::ClickSilent);
+    //      - Base light brightness    
     Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 11);
     Effects::Ambient::set_effect(Effects::AmbientEffect::CANDLE);  
   }

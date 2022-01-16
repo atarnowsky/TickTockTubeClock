@@ -38,7 +38,7 @@ public:
     Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
     SoundGenerator::ack_long();
     UI::next<SettingLEDBrightness>();
-    Display::SeparatorDot::disable();
+    Display::SeparatorDot::disable();    
   }
 };
 
@@ -133,7 +133,7 @@ public:
   }
 
   static void on_select_short() {
-      UI::next<Clock>();
+      UI::next<SettingTickSound>();
   }
 
   static void on_timeout() {
@@ -146,4 +146,52 @@ private:
 };
 
 uint8_t SettingTubeBrightness::brightness{10};
+
+
+class SettingTickSound : public State<settings_timeout> {
+public: 
+  static constexpr uint8_t setting_id = 3;
+
+  static void initialize() {    
+    sound_id = Settings::get(Setting::TICK_SOUND);
+    SoundGenerator::set_tick_tock(static_cast<TickTockSound>(sound_id));
+  }
+
+  static void finish() {     
+      Settings::set(Setting::TICK_SOUND, sound_id);
+      SoundGenerator::set_tick_tock(TickTockSound::None);
+  }
+
+  static void process() {      
+      Effects::Transition::display(setting_id, sound_id, {false, false, true, false});
+  }
+
+  static void on_plus_short() {
+      if(sound_id >= 5) return;
+      SoundGenerator::ack_short();
+      sound_id++;
+      SoundGenerator::set_tick_tock(static_cast<TickTockSound>(sound_id));
+  }
+
+  static void on_minus_short() {
+      if(sound_id <= 0) return;
+      SoundGenerator::ack_short();      
+      sound_id--;
+      SoundGenerator::set_tick_tock(static_cast<TickTockSound>(sound_id));
+  }
+
+  static void on_select_short() {
+      UI::next<Clock>();
+  }
+
+  static void on_timeout() {
+      UI::next<Clock>();
+  }
+
+
+private:
+  static uint8_t sound_id;
+};
+
+uint8_t SettingTickSound::sound_id{0};
 

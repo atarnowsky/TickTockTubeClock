@@ -31,13 +31,15 @@ class TimeSet;
 class SettingInit;
 class SettingLEDBrightness;
 class SettingTubeBrightness;
+class SettingTickSound;
 
 using UI = StateMachine<
   Clock,       // Index 0 automatically denotes the initial State to run
   TimeSet,
   SettingInit,
   SettingLEDBrightness,
-  SettingTubeBrightness
+  SettingTubeBrightness,
+  SettingTickSound
 >;
 
 // Yes, its pretty ugly to use UI within the following header files.
@@ -45,8 +47,6 @@ using UI = StateMachine<
 #include "state_clock.h"
 #include "state_timeset.h"
 #include "state_settings.h"
-
-
 
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,
