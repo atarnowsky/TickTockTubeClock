@@ -61,8 +61,8 @@ struct IO {
     template<int MODE, unsigned int COUNT>
     static inline void configure_pin(const array<pin_t, COUNT>& pins) 
     { 
-        for(pin_t pin : pins)
-            ::pinMode(pin, MODE); 
+        for(size_t index = 0; index < pins.size(); index++)
+            ::pinMode(pins[index], MODE); 
     }
 
     template<int MODE>

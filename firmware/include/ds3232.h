@@ -100,4 +100,9 @@ namespace DS3232M {
         Wire.endTransmission();
     }
 
+    inline void disable() {
+        util::write(0x0E, 0b10000100);
+        util::write(0x0F, 0b10000000);
+    }
+
 }

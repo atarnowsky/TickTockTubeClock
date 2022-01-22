@@ -1,12 +1,5 @@
 #pragma once
-#undef min
-#undef max
-#define ETL_NO_STL
-#include <etl/array.h>
-#include <etl/type_traits.h>
-using namespace etl;
-
-// ETL does not include i.e. make_index_sequence, this library does:
+#include "array.h"
 #include <ArxTypeTraits.h>
 
 namespace internal {
