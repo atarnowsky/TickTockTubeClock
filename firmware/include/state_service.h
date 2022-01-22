@@ -71,6 +71,10 @@ public:
       for(;;);
   }
 
+  static void on_select_short() {
+     UI::next<Clock>(); 
+  }
+
 private:
   static uint16_t acp_countdown;
 };
