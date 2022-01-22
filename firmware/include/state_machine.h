@@ -6,9 +6,10 @@
 #include "hw_map.h"
 #include "etl_fix.h"
 
+static constexpr unsigned long state_update_rate = 50;
 
 template<typename... States>
-class StateMachine : public RelaxedTask<50> {
+class StateMachine : public RelaxedTask<state_update_rate> {
  public:    
     static void initialize() {    
         ButtonManager::configure([](){

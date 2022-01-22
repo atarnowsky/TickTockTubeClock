@@ -42,16 +42,7 @@ public:
   }
 
   static void on_select_reset() {
-    SoundGenerator::ack_reset();
-    Settings::reset();
-    Display::SeparatorDot::disable();
-    SoundGenerator::set_tick_tock(TickTockSound::None);
-    RTCSync::reset();
-    
-    // Stop program completely:
-    cli();
-    IO::low(Pins::Anode::MuxA, Pins::Anode::MuxB); 
-    for(;;);
+    UI::next<ServiceMenu>();    
   }
 
   static void on_select_short() {
