@@ -16,6 +16,7 @@
 //#include "benchmark.h"
 #include "effects.h"
 #include "settings.h"
+#include "safety.h"
 
 // Features that will be implemented in future releases:
 //  - Allow Display to control multiplexing (Alternating, AOnly, BOnly, Off)
@@ -54,6 +55,7 @@ using sched = Scheduler<8000,
   Display::AntiCathodePoisoning,
   Effects::Transition,
   Effects::Ambient,
+  Safety::TemperatureCheck,
   BaseLightDimmer,    
   RTCSync,
   AmbientLight,

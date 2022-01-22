@@ -63,14 +63,6 @@ void SoundGenerator::error(uint8_t bits)
     delay(500);
 }
 
-void SoundGenerator::ack(uint8_t times){
-    for(uint8_t i = 0; i < times; i++)
-    {
-        tone(Pins::Speaker.arduino_pin(), 4000, 50);
-        delay(100);
-    }
-}
-
 void SoundGenerator::ack_short(){
     tone(Pins::Speaker.arduino_pin(), 1000, 75);
     delay(75);

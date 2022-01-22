@@ -28,7 +28,7 @@ namespace DS3232M {
             return n + 6 * (n / 10);
         }
 
-        uint8_t read(uint8_t reg) {
+        inline uint8_t read(uint8_t reg) {
             Wire.beginTransmission(0x68);
             Wire.write(reg);
             Wire.endTransmission();
@@ -36,7 +36,7 @@ namespace DS3232M {
             return Wire.read();
         }
 
-        uint8_t write(uint8_t reg, uint8_t value) {
+        inline uint8_t write(uint8_t reg, uint8_t value) {
             Wire.beginTransmission(0x68);
             Wire.write(reg);
             Wire.write(value);
