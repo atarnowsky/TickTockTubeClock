@@ -1,33 +1,26 @@
 #include "ambient_light.h"
-
-#include <ClosedCube_OPT3001.h>
+#include "simple_i2c.h"
 
 namespace {
-    ClosedCube_OPT3001 opt3001;
     float current_lux = 0.0f;
 }
 
 void AmbientLight::initialize() {
-    opt3001.begin(i2c_address);
-    OPT3001_Config config;  
-    config.RangeNumber = B1100;  
-    config.ConvertionTime = B1;
-    config.Latch = B0;
-    config.ModeOfConversionOperation = B11;
-
-    OPT3001_ErrorCode error = opt3001.writeConfig(config);
-    if (error != NO_ERROR) {
-        // Show error code
-        return;
-    }    
+    Wire.beginTransmission(i2c_address);
+    Wire.write(0x1);        
+    Wire.write(0b11001110);
+    Wire.write(0b00000000);
+    // Assume everything went well.
+    // No error handling for now...
+    Wire.endTransmission(); 
 }
 
 void AmbientLight::process() {
-    OPT3001 result = opt3001.readResult();
-    // TODO: What to do in case of error? Maybe show once and disable sensor?
-    if(result.error == NO_ERROR)  {
-        current_lux = result.lux;
-    }
+    uint16_t raw_result = I2C::read_16(i2c_address, 0x0);
+    uint16_t fractional = raw_result & 0xFFF;
+    uint8_t exponent = uint8_t(raw_result >> (16 - 4));
+
+    current_lux = 0.01 * pow(2, exponent) * fractional;
 }
 
 float AmbientLight::lux() {

@@ -31,14 +31,9 @@ constexpr uint8_t light_map[] = {
 class SettingInit : public State<settings_timeout> {
 public: 
   static void initialize() {    
-    // This state sets the common settings for all subsequent settings
-    SoundGenerator::set_tick_tock(TickTockSound::None);
-    Display::ShiftPWMProcessor::set_brightness(255);
-    Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 7);
-    Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
+    reset_environment();
     SoundGenerator::ack_long();
-    UI::next<SettingLEDBrightness>();
-    Display::SeparatorDot::disable();    
+    UI::next<SettingLEDBrightness>();     
   }
 };
 

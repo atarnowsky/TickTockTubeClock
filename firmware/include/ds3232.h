@@ -1,6 +1,8 @@
 #pragma once
 #include <Wire.h>
 #include "timing.h"
+#include "simple_i2c.h"
+
 // This is an absolute minimal interface to the RS3232M RTC IC.
 // For generale usage, I highly recommend a properly implemented
 // library like Jack Christensen's DS3232RTC Library
@@ -26,37 +28,20 @@ namespace DS3232M {
 
         inline uint8_t to_bcd(uint8_t n) {
             return n + 6 * (n / 10);
-        }
-
-        inline uint8_t read(uint8_t reg) {
-            Wire.beginTransmission(0x68);
-            Wire.write(reg);
-            Wire.endTransmission();
-            Wire.requestFrom(0x68, 1);
-            return Wire.read();
-        }
-
-        inline uint8_t write(uint8_t reg, uint8_t value) {
-            Wire.beginTransmission(0x68);
-            Wire.write(reg);
-            Wire.write(value);
-            return Wire.endTransmission();
-        }
+        }       
     }
 
     using temperature_t = uint8_t;
 
-    inline Status initialize() {
-        Wire.begin();
-
+    inline Status initialize() {    
         // Set control register
-        if(util::write(0x0E, 0b00100100) != 0){
+        if(I2C::write(0x68, 0x0E, 0b00100100) != 0){
             return Status::I2C_ERROR;   
         }
 
         // Set status register
-        uint8_t stat_reg = util::read(0x0F);
-        util::write(0x0F, 0b00000000);
+        uint8_t stat_reg = I2C::read(0x68, 0x0F);
+        I2C::write(0x68, 0x0F, 0b00000000);
 
         if((stat_reg & (1 << 7)) > 0) {
             return Status::OSCILLATOR_FAILURE;
@@ -68,10 +53,11 @@ namespace DS3232M {
 
     inline temperature_t temperature() {
         // We do not need the fractional part...
-        return util::read(0x11);
+        return I2C::read(0x68, 0x11);
     }
 
     inline time_pair time() {
+        // TODO: Use/Extend common I2C interface
         Wire.beginTransmission(0x68);
         Wire.write(0x00);
         uint8_t error = Wire.endTransmission();
@@ -90,6 +76,7 @@ namespace DS3232M {
     }
 
     inline void set_time(const time_pair& time) {
+        // TODO: Use/Extend common I2C interface
         Wire.beginTransmission(0x68);
         Wire.write(0x00);
         Wire.write(0); // seconds
@@ -101,8 +88,8 @@ namespace DS3232M {
     }
 
     inline void disable() {
-        util::write(0x0E, 0b10000100);
-        util::write(0x0F, 0b10000000);
+        I2C::write(0x68, 0x0E, 0b10000100);
+        I2C::write(0x68, 0x0F, 0b10000000);
     }
 
 }

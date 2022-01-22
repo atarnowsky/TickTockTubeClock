@@ -1,5 +1,6 @@
 #pragma once
 
+#include "effects.h"
 
 template<uint8_t timeout_seconds = 0>
 class State {
@@ -31,4 +32,15 @@ class State {
     // Will be called once when no buttons have been
     // pressed for the specified timeout
     inline static void on_timeout() {}
+
+protected:
+    // Helper method to save a little bit of flash:
+    // Reset the most common modes to a safe default    
+    static void reset_environment() {
+        SoundGenerator::set_tick_tock(TickTockSound::None);
+        Display::ShiftPWMProcessor::set_brightness(255);
+        Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 7);
+        Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
+        Display::SeparatorDot::disable();    
+    }
 };

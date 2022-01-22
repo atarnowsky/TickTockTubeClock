@@ -13,10 +13,11 @@
 #include "state.h"
 #include "state_machine.h"  
 #include "scheduler.h"
-//#include "benchmark.h"
 #include "effects.h"
 #include "settings.h"
 #include "safety.h"
+
+#include "simple_i2c.h"
 
 // Features that will be implemented in future releases:
 //  - Allow Display to control multiplexing (Alternating, AOnly, BOnly, Off)
@@ -70,6 +71,7 @@ using sched = Scheduler<8000,
 
 void setup() {    
   Pins::setup();  
+  I2C::initialize();
   
   BaseLightDimmer::set_fade_speed(2);
   BaseLightDimmer::set_brightness(0);

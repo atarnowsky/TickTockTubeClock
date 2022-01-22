@@ -10,12 +10,7 @@ public:
   static bool hours;
 
   static void initialize() {    
-    SoundGenerator::set_tick_tock(TickTockSound::None);
-    Display::ShiftPWMProcessor::set_brightness(255);
-    Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 7);
-    Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
-    Display::SeparatorDot::disable();
-
+    reset_environment();   
     timer = millis();  
     hours = false;
   }
