@@ -33,6 +33,7 @@ namespace Effects {
 
     uint8_t Transition::max_brightness = 255;
     uint8_t Ambient::max_brightness = 255;
+    bool needs_update = false;
     
     void Transition::initialize() {
 
@@ -40,16 +41,19 @@ namespace Effects {
 
     void Transition::set_max_brightness(uint8_t brightness) {
         max_brightness = brightness;
+        if(max_brightness < 255) max_brightness++;
     }
 
     void Transition::process() {
-        uint16_t elapsed = millis() - effect_start;
-        if(elapsed > (uint16_t(1) << effect_duration)) 
-            return; // Effect passed, nothing to do
-
         auto copy_next = [&]() {
             Display::ShiftPWMProcessor::alter_buffer(buffer_next);
         };
+
+        uint16_t elapsed = millis() - effect_start;
+        if(elapsed > (uint16_t(1) << effect_duration)) {
+            if(needs_update) copy_next();
+            return; // Effect passed, nothing to do
+        }
 
         auto copy_last = [&]() {
             Display::ShiftPWMProcessor::alter_buffer(buffer_last);
@@ -92,8 +96,8 @@ namespace Effects {
                 }
                 
                 // Use squared brightness to compensate for visual non-linearity
-                target = (uint16_t(target) * uint16_t(target)) >> 8;
-                Display::ShiftPWMProcessor::set_brightness(target);             
+                target = (uint16_t(target) * uint16_t(target)) >> 8;             
+                Display::ShiftPWMProcessor::set_brightness((max_brightness * target) >> 8);             
                 break;
             }
 
@@ -123,9 +127,9 @@ namespace Effects {
     }
 
     void Transition::display(uint8_t hours, uint8_t minutes, const array<bool, 4>& dots) {
-        // TODO: This does not respect dots!
-        if((displayed_hours == hours) && (displayed_minutes == minutes)) return;
-
+        needs_update = true;
+        bool restart_effect = !((displayed_hours == hours) && (displayed_minutes == minutes));
+        
         displayed_hours = hours;
         displayed_minutes = minutes;
 
@@ -187,8 +191,10 @@ namespace Effects {
         }
 
         // Reset timer
-        effect_counter = 0;
-        effect_start = millis();
+        if(restart_effect) {
+            effect_counter = 0;
+            effect_start = millis();
+        }
     }
 
     void Transition::set_effect(NumberTransition transition, uint8_t duration) {
@@ -227,15 +233,16 @@ namespace Effects {
             }
 
             case AmbientEffect::CANDLE: {
-                if(ambient_counter < 10) break;
+                if(ambient_counter < timer_threshold) break;
 
                 Display::ShiftPWMProcessor::set_fade_speed(10);
-                const uint8_t target = fastrand(255);
+                const uint16_t target = fastrand(max_brightness) + 8;
                 if(target < max_brightness)
                     Display::ShiftPWMProcessor::set_fade_target(target); 
                 else 
                     Display::ShiftPWMProcessor::set_fade_target(max_brightness); 
-                ambient_counter = 0;           
+                ambient_counter = 0;  
+                timer_threshold = fastrand(15) + 15;          
                 break;
             }
             
@@ -319,6 +326,7 @@ namespace Effects {
 
     void Ambient::set_max_brightness(uint8_t brightness) {
         max_brightness = brightness;
+        if(max_brightness < 255) max_brightness++;
     }
       
     void Ambient::set_effect(AmbientEffect effect) {

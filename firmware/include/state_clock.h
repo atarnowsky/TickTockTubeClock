@@ -27,18 +27,17 @@ public:
   }
 
   static void process() {    
+    static int cnt = 0;
     constexpr static uint16_t second_timeout = 1000/state_update_rate;    
-    // TODO: Remove int16 conversion as soon as new DS3232 header is verified
-    time_pair time = RTCSync::current_time();
-    Effects::Transition::display(time.hours, time.minutes);    
     
-    // TODO: Implement special transition for dots
-    Display::BufferControl::show_dots({false, false, dot, false});
-
     if(timer++ >= second_timeout) {
       timer = 0;
       dot = !dot;
       SoundGenerator::tick();
+      cnt++;
+
+      time_pair time = RTCSync::current_time();
+      Effects::Transition::display(time.hours, time.minutes, {false, false, dot, false});  
     }
   }
 
