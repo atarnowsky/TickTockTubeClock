@@ -1,5 +1,6 @@
 #include "sound.h"
 #include "hw_map.h"
+#include "toneAC2.h"
 
 namespace {
     TickTockSound tick_tock = TickTockSound::None;
@@ -19,7 +20,7 @@ void SoundGenerator::process(){
     };
 
     auto short_beep = [](uint8_t length = 50, int16_t freq = 320) {
-        tone(Pins::Speaker.arduino_pin(), freq, length);
+        toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), freq, length, false);
     };
 
     switch (tick_tock) {
@@ -57,39 +58,36 @@ void SoundGenerator::error(uint8_t bits)
 {        
     for(int i = 0; i < 4; i++)
     {            
-        tone(Pins::Speaker.arduino_pin(), ((bits & (1 << i)) > 0 ? 800 : 400), 250);            
+        toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), ((bits & (1 << i)) > 0 ? 800 : 400), 250, true);            
         delay(500);
     }
     delay(500);
 }
 
 void SoundGenerator::ack_short(){
-    tone(Pins::Speaker.arduino_pin(), 1000, 75);
-    delay(75);
-    noTone(Pins::Speaker.arduino_pin());
+    toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), 1000, 75, true);
+    delay(75);    
 }
 
 void SoundGenerator::ack_long() {
-    tone(Pins::Speaker.arduino_pin(), 1000, 75);
+    toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), 1000, 75, true);
     delay(75 + 150);
-    tone(Pins::Speaker.arduino_pin(), 2000, 75);
+    toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), 2000, 75, true);
     delay(75);
 }
 
 void SoundGenerator::ack_reset() {
-    tone(Pins::Speaker.arduino_pin(), 1000, 75);
+    toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), 1000, 75, true);
     delay(75 + 150);
-    tone(Pins::Speaker.arduino_pin(), 2000, 75);
+    toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), 2000, 75, true);
     delay(150);
     for(uint8_t i = 0; i < 3; i++) {
-        tone(Pins::Speaker.arduino_pin(), 1000, 250);
+        toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), 1000, 250, true);
         delay(500);
     }
 }
 
 void SoundGenerator::play(const Note& n) {
-    tone(Pins::Speaker.arduino_pin(), n[0], n[1]);
-    delay(n[1]);
-    noTone(Pins::Speaker.arduino_pin());
+    toneAC2(Pins::Speaker.arduino_pin(), Pins::Unused.arduino_pin(), n[0], n[1]);
     delay(n[2]);
 }

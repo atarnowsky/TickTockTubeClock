@@ -19,15 +19,6 @@
 
 #include "simple_i2c.h"
 
-// Features that will be implemented in future releases:
-//  - Allow Display to control multiplexing (Alternating, AOnly, BOnly, Off)
-//    (needed for cathode poisoning prevention)
-//  - Add blink feature to BufferControl
-//  - Better ghosting prevention
-//  - Temperature watchdog that shuts down the display in case of over temperature
-//  - Cathode poisoning prevention with customizable time(-span)
-//  - Various display-change effects
-
 class Clock;
 class TimeSet;
 class SettingInit;

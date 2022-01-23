@@ -31,6 +31,10 @@ struct ppin_t {
             return PIN_PC1;
         }
 
+        if (*this == 2_C) {
+            return PIN_PC2;
+        }
+
         return 255; // Error
     }
 };

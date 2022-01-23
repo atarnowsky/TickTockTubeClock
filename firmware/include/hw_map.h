@@ -10,6 +10,7 @@ namespace Pins {
     constexpr array<pin_t, 3> Buttons = {PIN_PD1, PIN_PD2, PIN_PD0};
     //constexpr array<ppin_t, 3> Buttons = {1_D, 2_D, 0_D};
     constexpr ppin_t Speaker = 1_C;
+    constexpr ppin_t Unused = 2_C;
     constexpr ppin_t Light = 0_C;
 
     namespace I2C {

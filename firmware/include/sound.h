@@ -15,7 +15,6 @@ enum class TickTockSound : uint8_t {
     HighBeep = 5, 
 };
 
-// TODO: Use a non-blocking tone function and split class up into SoundGenerator and SoundManager
 class SoundGenerator : public RelaxedTask<1000> {
  public:
     static void initialize();
