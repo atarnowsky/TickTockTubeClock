@@ -35,6 +35,8 @@ public:
       if(delay_counter == delay_maximum) {          
           delay_counter = 0;
           if(acp_countdown > 0) {
+            Effects::Transition::set_effect(Effects::NumberTransition::NONE, 7);
+            Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
             Display::AntiCathodePoisoning::enable();
             acp_countdown--;
           } else if(acp_countdown == 0) {

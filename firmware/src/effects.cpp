@@ -52,6 +52,7 @@ namespace Effects {
         uint16_t elapsed = millis() - effect_start;
         if(elapsed > (uint16_t(1) << effect_duration)) {
             if(needs_update) copy_next();
+            needs_update = false;
             return; // Effect passed, nothing to do
         }
 
