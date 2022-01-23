@@ -57,8 +57,7 @@ public:
 
   static void on_minus_long() {      
       SoundGenerator::ack_reset();
-      Settings::reset();
-      Display::SeparatorDot::disable();
+      Settings::reset();      
       SoundGenerator::set_tick_tock(TickTockSound::None);
       RTCSync::reset();
     

@@ -54,8 +54,7 @@ using UI = StateMachine<
 #include "state_service.h"
 
 using sched = Scheduler<8000, 
-  Display::ShiftPWMProcessor,
-  Display::SeparatorDot,
+  Display::ShiftPWMProcessor,  
   Display::AntiCathodePoisoning,
   Effects::Transition,
   Effects::Ambient,

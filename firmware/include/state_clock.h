@@ -13,8 +13,7 @@ public:
     Display::ShiftPWMProcessor::set_brightness(tube_brightness); // Move to loop  
     Effects::Transition::set_max_brightness(tube_brightness);
     Effects::Ambient::set_max_brightness(tube_brightness);    
-    SoundGenerator::set_tick_tock(static_cast<TickTockSound>(Settings::get(Setting::TICK_SOUND)));
-    Display::SeparatorDot::enable();
+    SoundGenerator::set_tick_tock(static_cast<TickTockSound>(Settings::get(Setting::TICK_SOUND)));    
 
     // Load settings from EEPROM
     // Set non-dynamic modules    
@@ -25,9 +24,20 @@ public:
   }
 
   static void process() {
+    static uint16_t timer = 0;
+    static uint16_t second_timeout = 1000/state_update_rate;
+    static bool dot = false;
     // TODO: Remove int16 conversion as soon as new DS3232 header is verified
     time_pair time = RTCSync::current_time();
     Effects::Transition::display(time.hours, time.minutes);    
+    
+    // TODO: Implement special transition for dots
+    Display::BufferControl::show_dots({false, false, dot, false});
+
+    if(timer++ >= second_timeout) {
+      timer = 0;
+      dot = !dot;
+    }
   }
 
   // Increment hours by one (summer-/wintertime)

@@ -76,15 +76,6 @@ namespace Display {
         static void set_dots(const array<bool, 4>& dots);
     };
 
-    class SeparatorDot : public RelaxedTask<1000> {
-     public:
-        static void initialize();
-        static void process();
-        static void enable();
-        static void disable();
-    };
-
-
     // === AntiCathodePoisoning (ACP) ===
 
     // Tries to reduce cathode poisoning effects by cycling through
