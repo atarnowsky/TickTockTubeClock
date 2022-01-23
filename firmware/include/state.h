@@ -1,6 +1,7 @@
 #pragma once
 
 #include "effects.h"
+#include "base_light.h"
 
 template<uint8_t timeout_seconds = 0>
 class State {

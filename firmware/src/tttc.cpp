@@ -19,30 +19,13 @@
 
 #include "simple_i2c.h"
 
-class Clock;
-class TimeSet;
-class SettingInit;
-class SettingLEDBrightness;
-class SettingTubeBrightness;
-class SettingTickSound;
-class ServiceMenu;
-
-using UI = StateMachine<
-  Clock,       // Index 0 automatically denotes the initial State to run
-  TimeSet,
-  SettingInit,
-  SettingLEDBrightness,
-  SettingTubeBrightness,
-  SettingTickSound,
-  ServiceMenu
->;
-
-// Yes, its pretty ugly to use UI within the following header files.
-// This seriously needs some cleanup...
 #include "state_clock.h"
 #include "state_timeset.h"
 #include "state_settings.h"
 #include "state_service.h"
+
+#include "configuration.h"
+
 
 using sched = Scheduler<8000, 
   Display::ShiftPWMProcessor,  

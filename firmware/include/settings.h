@@ -27,15 +27,15 @@ struct SettingSet {
 static_assert(sizeof(SettingSet) == static_cast<uint8_t>(Setting::FIRST_START));
 
 namespace Settings {
-    void set(Setting setting, uint8_t value) {
+    inline void set(Setting setting, uint8_t value) {
         EEPROM[static_cast<uint8_t>(setting)] = value;
     }
 
-    uint8_t get(Setting setting) {
+    inline uint8_t get(Setting setting) {
         return EEPROM[static_cast<uint8_t>(setting)];
     }
 
-    SettingSet get() {
+    inline SettingSet get() {
         SettingSet result;
         array<uint8_t, static_cast<uint8_t>(Setting::FIRST_START)>& raw =
             reinterpret_cast<array<uint8_t, static_cast<uint8_t>(Setting::FIRST_START)>&>(result);
@@ -52,7 +52,7 @@ namespace Settings {
         return result;
     }
 
-    bool on_first_start() {
+    inline bool on_first_start() {
         if(get(Setting::FIRST_START) == 1) {
             set(Setting::FIRST_START, 0);
             return true;
@@ -60,7 +60,7 @@ namespace Settings {
         return false;        
     }
 
-    void reset() {
+    inline void reset() {
         set(Setting::FIRST_START, 1);
         set(Setting::LED_BRIGHTNESS, 32);
         set(Setting::TUBE_BRIGHTNESS, 255);

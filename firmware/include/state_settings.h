@@ -1,10 +1,12 @@
 #pragma once
 
+#include "configuration.h"
 #include "state.h"
 #include "timing.h"
 #include "sound.h"
 #include "settings.h"
 #include "base_light.h"
+#include "display.h"
 
 class SettingLEDBrightness;
 class SettingTubeBrightness;
@@ -88,8 +90,6 @@ private:
   static uint8_t brightness;
 };
 
-uint8_t SettingLEDBrightness::brightness{10};
-
 
 class SettingTubeBrightness : public State<settings_timeout> {
 public: 
@@ -139,8 +139,6 @@ public:
 private:
   static uint8_t brightness;
 };
-
-uint8_t SettingTubeBrightness::brightness{10};
 
 
 class SettingTickSound : public State<settings_timeout> {
@@ -194,7 +192,3 @@ private:
   static uint8_t sound_id;
   static uint16_t timer;
 };
-
-uint8_t SettingTickSound::sound_id{0};
-uint16_t SettingTickSound::timer{0};
-

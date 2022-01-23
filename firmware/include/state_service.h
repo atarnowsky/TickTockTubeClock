@@ -1,5 +1,6 @@
 #pragma once
 
+#include "configuration.h"
 #include "state.h"
 #include "timing.h"
 #include "display.h"
@@ -25,19 +26,22 @@ class ServiceMenu : public State<0> {
 public: 
   static void initialize() {        
     reset_environment();
+    acp_countdown = -1;
     SoundGenerator::ack_reset();        
   }
 
-  static void process() {
-      static uint8_t delay_counter = 0;
+  static void process() {      
       static constexpr uint8_t delay_maximum = 1000 / state_update_rate;
       if(delay_counter == delay_maximum) {          
           delay_counter = 0;
           if(acp_countdown > 0) {
             Display::AntiCathodePoisoning::enable();
             acp_countdown--;
-          } else {
+          } else if(acp_countdown == 0) {
             Display::AntiCathodePoisoning::disable();
+            acp_countdown = -1;
+            UI::next<Clock>(); 
+          } else {
             DS3232M::temperature_t temperature = DS3232M::temperature();
             Effects::Transition::display(255, temperature, {false, false, false, false});            
           }
@@ -72,8 +76,8 @@ public:
   }
 
 private:
-  static uint16_t acp_countdown;
+  static int16_t acp_countdown;
+  static uint8_t delay_counter;
 };
 
-uint16_t ServiceMenu::acp_countdown = 0;
 

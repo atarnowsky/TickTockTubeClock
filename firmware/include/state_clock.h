@@ -1,5 +1,7 @@
 #pragma once
 
+#include "configuration.h"
+#include "display.h"
 #include "state.h"
 #include "timing.h"
 #include "settings.h"
@@ -67,6 +69,3 @@ private:
   static uint16_t timer;    
   static bool dot;
 };
-
-uint16_t Clock::timer = 0;
-bool Clock::dot = false;
