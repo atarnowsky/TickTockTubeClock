@@ -64,7 +64,10 @@ namespace Display {
         static void show_time(uint16_t value);
         static void show_number(uint16_t value);
         static void show_direct(const array<uint8_t, 4>& numbers, const array<bool, 4>& dots);
-        static void show_number(float value);
+
+        // For easier debugging only.        
+        // static void show_number(float value);
+
         static void show_dots(const array<bool, 4>& dots = {false, false, false, false});
         static void clear();
         

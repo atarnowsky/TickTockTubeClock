@@ -75,15 +75,25 @@ namespace Effects {
                 break;
             }
 
-            case NumberTransition::FADE_BLACK: {   
-                // TODO: Do not use floating point, use some fixed point cos approximation
-                float time_index = elapsed/float(1 << effect_duration);
-                float value = 0.5f * cosf(2.0f * 3.1416f * time_index) + 0.5f;                
-                if((effect_counter == 0) && (time_index >= 0.5f)) {
-                    copy_next();
-                    effect_counter++;
+            case NumberTransition::FADE_BLACK: {                   
+                const uint16_t duration_half = uint16_t(1) << (effect_duration - 1);
+                uint8_t target = 0;
+
+                if(elapsed < duration_half) {
+                    uint32_t index = (uint32_t(elapsed) << 8)/duration_half;   
+                    target = 255 - ((255 * index) >> 8);
+                } else {
+                    if(effect_counter == 0) {
+                        copy_next();
+                        effect_counter++;
+                    }
+                    uint32_t index = (uint32_t(elapsed-duration_half) << 8)/duration_half;
+                    target = (255 * index) >> 8;
                 }
-                Display::ShiftPWMProcessor::set_brightness(max_brightness * value);
+                
+                // Use squared brightness to compensate for visual non-linearity
+                target = (uint16_t(target) * uint16_t(target)) >> 8;
+                Display::ShiftPWMProcessor::set_brightness(target);             
                 break;
             }
 

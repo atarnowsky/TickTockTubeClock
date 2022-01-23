@@ -39,9 +39,7 @@ public:
           } else {
             Display::AntiCathodePoisoning::disable();
             DS3232M::temperature_t temperature = DS3232M::temperature();
-            Effects::Transition::display(255, temperature, {false, false, false, false});
-            //float lux = AmbientLight::lux();
-            //Display::BufferControl::show_number(lux);            
+            Effects::Transition::display(255, temperature, {false, false, false, false});            
           }
       }      
       delay_counter++;

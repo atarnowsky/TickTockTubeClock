@@ -185,45 +185,45 @@ namespace Display {
         set_dots({false, false, false, false});  
     }
 
-    void BufferControl::show_number(float value) {
-        auto number = [](uint16_t n) -> array<uint8_t, 4> 
-        {
-            if(n > 9999) return {255, 255, 255, 255};
-            array<uint8_t, 4>  result;
-            result[3] = (n / 1000) % 10;
-            result[2] = (n / 100) % 10;
-            result[1] = (n / 10) % 10;
-            result[0] = n % 10;
-            return result;
-        };
+    // void BufferControl::show_number(float value) {
+    //     auto number = [](uint16_t n) -> array<uint8_t, 4> 
+    //     {
+    //         if(n > 9999) return {255, 255, 255, 255};
+    //         array<uint8_t, 4>  result;
+    //         result[3] = (n / 1000) % 10;
+    //         result[2] = (n / 100) % 10;
+    //         result[1] = (n / 10) % 10;
+    //         result[0] = n % 10;
+    //         return result;
+    //     };
 
-        // TODO: There is definitely a more elegant way to achieve this!
-        auto decimals = [&number](float v) -> array<uint8_t, 4> 
-        {
-            if(v > 999.9)
-                return number(lroundf(v));
-            if(v > 99.99)
-                return number(lroundf(v*10.0f));
-            if(v > 9.999)
-                return number(lroundf(v*100.0f));
-            return number(lroundf(v*1000.0f));                
-        };
+    //     // TODO: There is definitely a more elegant way to achieve this!
+    //     auto decimals = [&number](float v) -> array<uint8_t, 4> 
+    //     {
+    //         if(v > 999.9)
+    //             return number(lroundf(v));
+    //         if(v > 99.99)
+    //             return number(lroundf(v*10.0f));
+    //         if(v > 9.999)
+    //             return number(lroundf(v*100.0f));
+    //         return number(lroundf(v*1000.0f));                
+    //     };
 
-        // TODO: There is definitely a more elegant way to achieve this!
-        auto dots = [](float v) -> array<bool, 4> 
-        {
-            if(v > 999.9)
-                return {true, false, false, false};
-            if(v > 99.99)
-                return {false, true, false, false};
-            if(v > 9.999)
-                return {false, false, true, false};
-            return {false, false, false, true};
-        };
+    //     // TODO: There is definitely a more elegant way to achieve this!
+    //     auto dots = [](float v) -> array<bool, 4> 
+    //     {
+    //         if(v > 999.9)
+    //             return {true, false, false, false};
+    //         if(v > 99.99)
+    //             return {false, true, false, false};
+    //         if(v > 9.999)
+    //             return {false, false, true, false};
+    //         return {false, false, false, true};
+    //     };
 
-        set_numbers(decimals(value));  
-        set_dots(dots(value));  
-    }
+    //     set_numbers(decimals(value));  
+    //     set_dots(dots(value));  
+    // }
 
     void BufferControl::show_direct(const array<uint8_t, 4>& numbers, const array<bool, 4>& dots) {
         // Clear complete buffer            

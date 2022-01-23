@@ -134,10 +134,10 @@ inline uint16_t fastrand_10() {
 } 
 
 inline uint16_t fastrand(uint16_t max) { 
-    return max * (fastrand()/float(FASTRAND_MAX));
+    return fastrand() % max;
 } 
 
-inline uint16_t fastrand_sq(uint16_t max) { 
-    const float tmp = fastrand()/float(FASTRAND_MAX);
-    return max * tmp * tmp;
+inline uint16_t fastrand_sq(uint16_t max) {     
+    uint32_t tmp = fastrand(0x7FF);
+    return uint16_t((uint32_t(max) * tmp * tmp) >> 24);
 } 

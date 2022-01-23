@@ -2,7 +2,7 @@
 #include "simple_i2c.h"
 
 namespace {
-    float current_lux = 0.0f;
+    uint32_t current_lux_milli = 0;
 }
 
 void AmbientLight::initialize() {
@@ -20,9 +20,9 @@ void AmbientLight::process() {
     uint16_t fractional = raw_result & 0xFFF;
     uint8_t exponent = uint8_t(raw_result >> (16 - 4));
 
-    current_lux = 0.01 * pow(2, exponent) * fractional;
+    current_lux_milli = fractional * (1 << exponent) * 10;
 }
 
-float AmbientLight::lux() {
-    return current_lux;
+uint32_t AmbientLight::milli_lux() {
+    return current_lux_milli;
 }
