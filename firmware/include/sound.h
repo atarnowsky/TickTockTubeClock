@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "scheduler.h"
 #include "hw_map.h"
 
 using Note = array<uint16_t, 3>;
@@ -15,21 +14,18 @@ enum class TickTockSound : uint8_t {
     HighBeep = 5, 
 };
 
-class SoundGenerator : public RelaxedTask<1000> {
- public:
-    static void initialize();
-    static void process();
-    static void set_tick_tock(TickTockSound v);    
+namespace SoundGenerator  {
+    void set_tick_tock(TickTockSound v);    
 
-    static void error(uint8_t bits);
+    void error(uint8_t bits);
 
-    static void ack_short();
-    static void ack_long();
-    static void ack_reset();
+    void ack_short();
+    void ack_long();
+    void ack_reset();
+    void tick();
 
-    static void play(const Note& n);
+    void play(const Note& n);
 
- private:
     static constexpr uint16_t speaker_resonant_frequency = 4000; // [Hz]
 };
 

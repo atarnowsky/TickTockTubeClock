@@ -3,6 +3,7 @@
 #include "state.h"
 #include "timing.h"
 #include "settings.h"
+#include "sound.h"
 
 
 class Clock : public State<0>{
@@ -23,10 +24,8 @@ public:
     Effects::Ambient::set_effect(Effects::AmbientEffect::CANDLE);  
   }
 
-  static void process() {
-    static uint16_t timer = 0;
-    static uint16_t second_timeout = 1000/state_update_rate;
-    static bool dot = false;
+  static void process() {    
+    constexpr static uint16_t second_timeout = 1000/state_update_rate;    
     // TODO: Remove int16 conversion as soon as new DS3232 header is verified
     time_pair time = RTCSync::current_time();
     Effects::Transition::display(time.hours, time.minutes);    
@@ -37,6 +36,7 @@ public:
     if(timer++ >= second_timeout) {
       timer = 0;
       dot = !dot;
+      SoundGenerator::tick();
     }
   }
 
@@ -62,4 +62,11 @@ public:
   static void on_select_long() {
     UI::next<SettingInit>();
   }
+
+private:
+  static uint16_t timer;    
+  static bool dot;
 };
+
+uint16_t Clock::timer = 0;
+bool Clock::dot = false;

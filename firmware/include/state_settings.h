@@ -154,11 +154,17 @@ public:
 
   static void finish() {     
       Settings::set(Setting::TICK_SOUND, sound_id);
-      SoundGenerator::set_tick_tock(TickTockSound::None);
   }
 
-  static void process() {      
+  static void process() {    
+      constexpr static uint16_t second_timeout = 1000/state_update_rate;
       Effects::Transition::display(setting_id, sound_id, {false, false, true, false});
+
+      if(timer++ >= second_timeout) {
+          timer = 0;         
+          SoundGenerator::set_tick_tock(static_cast<TickTockSound>(sound_id)); 
+          SoundGenerator::tick();
+      }
   }
 
   static void on_plus_short() {
@@ -186,7 +192,9 @@ public:
 
 private:
   static uint8_t sound_id;
+  static uint16_t timer;
 };
 
 uint8_t SettingTickSound::sound_id{0};
+uint16_t SettingTickSound::timer{0};
 

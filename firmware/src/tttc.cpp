@@ -53,7 +53,6 @@ using sched = Scheduler<8000,
   BaseLightDimmer,    
   RTCSync,
   AmbientLight,
-  SoundGenerator,
   UI
   //TimingBenchmark  
 >;

@@ -36,8 +36,7 @@ class State {
 protected:
     // Helper method to save a little bit of flash:
     // Reset the most common modes to a safe default    
-    static void reset_environment() {
-        SoundGenerator::set_tick_tock(TickTockSound::None);
+    static void reset_environment() {        
         Display::ShiftPWMProcessor::set_brightness(255);
         Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 7);
         Effects::Ambient::set_effect(Effects::AmbientEffect::NONE);    
