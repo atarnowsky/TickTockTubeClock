@@ -27,6 +27,9 @@ uint8_t SettingAmbientEffect::effect_id{0};
 
 uint8_t SettingNightMode::threshold{0};
 
+uint8_t SettingOffBegin::hour{0};
+uint8_t SettingOffEnd::hour{0};
+
 // SettingInit ---
 
 void SettingInit::initialize() {    
@@ -264,9 +267,80 @@ void SettingNightMode::on_minus_short() {
 }
 
 void SettingNightMode::on_select_short() {
-    UI::next<Clock>();
+    UI::next<SettingOffBegin>();
 }
 
 void SettingNightMode::on_timeout() {
+    UI::next<Clock>();
+}
+
+
+// SettingOffBegin ---
+
+void SettingOffBegin::initialize() {    
+    hour = Settings::get(Setting::SHUTDOWN_BEGIN);    
+}
+
+void SettingOffBegin::finish() {     
+    Settings::set(Setting::SHUTDOWN_BEGIN, hour);    
+}
+
+void SettingOffBegin::process() {       
+    Effects::Transition::display(setting_id, hour, {false, false, true, false});
+}
+
+void SettingOffBegin::on_plus_short() {
+    hour++;
+    if(hour > 23) hour = 0;
+    SoundGenerator::ack_short();
+}
+
+void SettingOffBegin::on_minus_short() {
+    hour--;
+    if(hour > 23) hour = 23;
+    SoundGenerator::ack_short();
+}
+
+void SettingOffBegin::on_select_short() {
+    UI::next<SettingOffEnd>();
+}
+
+void SettingOffBegin::on_timeout() {
+    UI::next<Clock>();
+}
+
+
+
+// SettingOffEnd ---
+
+void SettingOffEnd::initialize() {    
+    hour = Settings::get(Setting::SHUTDOWN_END);    
+}
+
+void SettingOffEnd::finish() {     
+    Settings::set(Setting::SHUTDOWN_END, hour);    
+}
+
+void SettingOffEnd::process() {       
+    Effects::Transition::display(setting_id, hour, {false, false, true, false});
+}
+
+void SettingOffEnd::on_plus_short() {
+    hour++;
+    if(hour > 23) hour = 0;
+    SoundGenerator::ack_short();
+}
+
+void SettingOffEnd::on_minus_short() {
+    hour--;
+    if(hour > 23) hour = 23;
+    SoundGenerator::ack_short();
+}
+
+void SettingOffEnd::on_select_short() {
+    UI::next<Clock>();
+}
+
+void SettingOffEnd::on_timeout() {
     UI::next<Clock>();
 }

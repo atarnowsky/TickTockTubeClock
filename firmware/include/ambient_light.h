@@ -2,7 +2,7 @@
 
 #include "scheduler.h"
 
-class AmbientLight : public RelaxedTask<2500> {
+class AmbientLight : public RelaxedTask<1000> {
  public:
     static void initialize();
     static void process();

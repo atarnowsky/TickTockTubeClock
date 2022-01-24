@@ -11,6 +11,8 @@ class SettingTickSound;
 class SettingTransitionEffect;
 class SettingAmbientEffect;
 class SettingNightMode;
+class SettingOffBegin;
+class SettingOffEnd;
 class ServiceMenu;
 
 using UI = StateMachine<
@@ -23,5 +25,7 @@ using UI = StateMachine<
   SettingTransitionEffect,
   SettingAmbientEffect,
   SettingNightMode,
+  SettingOffBegin,
+  SettingOffEnd,
   ServiceMenu
 >;

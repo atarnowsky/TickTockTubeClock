@@ -14,7 +14,7 @@ class SettingTransition;
 class SettingAmbient;
 class SettingTickTock;
 
-constexpr uint8_t settings_timeout = 15;
+static constexpr uint8_t settings_timeout = 15;
 
 class SettingInit : public State<settings_timeout> {
 public: 
@@ -121,4 +121,38 @@ public:
 
 private:
   static uint8_t threshold;
+};
+
+
+class SettingOffBegin : public State<settings_timeout> {
+public: 
+  static constexpr uint8_t setting_id = 7;
+
+  static void initialize();
+  static void finish();
+  static void process();
+  static void on_plus_short();
+  static void on_minus_short();
+  static void on_select_short();
+  static void on_timeout();
+
+private:
+  static uint8_t hour;
+};
+
+
+class SettingOffEnd : public State<settings_timeout> {
+public: 
+  static constexpr uint8_t setting_id = 8;
+
+  static void initialize();
+  static void finish();
+  static void process();
+  static void on_plus_short();
+  static void on_minus_short();
+  static void on_select_short();
+  static void on_timeout();
+
+private:
+  static uint8_t hour;
 };
