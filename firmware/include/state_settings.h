@@ -105,3 +105,20 @@ public:
 private:
   static uint8_t effect_id;
 };
+
+
+class SettingNightMode : public State<settings_timeout> {
+public: 
+  static constexpr uint8_t setting_id = 6;
+
+  static void initialize();
+  static void finish();
+  static void process();
+  static void on_plus_short();
+  static void on_minus_short();
+  static void on_select_short();
+  static void on_timeout();
+
+private:
+  static uint8_t threshold;
+};

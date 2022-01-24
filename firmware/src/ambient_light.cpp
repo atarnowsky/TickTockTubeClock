@@ -2,7 +2,7 @@
 #include "simple_i2c.h"
 
 namespace {
-    uint32_t current_lux_milli = 0;
+    uint32_t current_lux_milli = 255;
 }
 
 void AmbientLight::initialize() {

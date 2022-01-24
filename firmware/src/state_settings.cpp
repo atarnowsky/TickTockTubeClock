@@ -1,4 +1,5 @@
 #include "state_settings.h"
+#include "ambient_light.h"
 
 constexpr uint8_t light_map[] = {
     0,
@@ -23,6 +24,8 @@ uint16_t SettingTickSound::timer{0};
 
 uint8_t SettingTransitionEffect::effect_id{0};
 uint8_t SettingAmbientEffect::effect_id{0};
+
+uint8_t SettingNightMode::threshold{0};
 
 // SettingInit ---
 
@@ -224,9 +227,46 @@ void SettingAmbientEffect::on_minus_short() {
 }
 
 void SettingAmbientEffect::on_select_short() {
-    UI::next<Clock>();
+    UI::next<SettingNightMode>();
 }
 
 void SettingAmbientEffect::on_timeout() {
+    UI::next<Clock>();
+}
+
+
+// SettingNightMode ---
+
+void SettingNightMode::initialize() {    
+    threshold = Settings::get(Setting::NIGHT_MODE_THRESHOLD);    
+}
+
+void SettingNightMode::finish() {     
+    Settings::set(Setting::NIGHT_MODE_THRESHOLD, threshold);    
+}
+
+void SettingNightMode::process() {       
+    uint8_t displayed = threshold;
+    if(displayed > 99) displayed = 99;
+    Effects::Transition::display(setting_id, displayed, {false, false, true, false});
+}
+
+void SettingNightMode::on_plus_short() {
+    uint32_t lux = AmbientLight::milli_lux()/10;
+    if(lux > 254) lux = 254;
+    threshold = lux + 1;
+    SoundGenerator::ack_short();
+}
+
+void SettingNightMode::on_minus_short() {
+    threshold = 0;
+    SoundGenerator::ack_short();
+}
+
+void SettingNightMode::on_select_short() {
+    UI::next<Clock>();
+}
+
+void SettingNightMode::on_timeout() {
     UI::next<Clock>();
 }

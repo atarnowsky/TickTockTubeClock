@@ -10,6 +10,7 @@ class SettingTubeBrightness;
 class SettingTickSound;
 class SettingTransitionEffect;
 class SettingAmbientEffect;
+class SettingNightMode;
 class ServiceMenu;
 
 using UI = StateMachine<
@@ -21,5 +22,6 @@ using UI = StateMachine<
   SettingTickSound,
   SettingTransitionEffect,
   SettingAmbientEffect,
+  SettingNightMode,
   ServiceMenu
 >;
