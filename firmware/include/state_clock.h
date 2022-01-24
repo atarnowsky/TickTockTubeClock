@@ -11,19 +11,32 @@
 class Clock : public State<0>{
 public:
   static void initialize() {
-    BaseLightDimmer::set_fade_target(Settings::get(Setting::LED_BRIGHTNESS));
-    uint8_t tube_brightness = Settings::get(Setting::TUBE_BRIGHTNESS);
-    Display::ShiftPWMProcessor::set_brightness(tube_brightness); // Move to loop  
-    Effects::Transition::set_max_brightness(tube_brightness);
-    Effects::Ambient::set_max_brightness(tube_brightness);    
-    SoundGenerator::set_tick_tock(static_cast<TickTockSound>(Settings::get(Setting::TICK_SOUND)));    
+    settings = Settings::get();
 
-    // Load settings from EEPROM
-    // Set non-dynamic modules    
-    //      - Effects (Crossfade, Stationary)
-    //      - Base light brightness    
-    Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 11);
-    Effects::Ambient::set_effect(Effects::AmbientEffect::CANDLE);  
+    BaseLightDimmer::set_fade_target(settings.led_brightness);
+    Display::ShiftPWMProcessor::set_brightness(settings.tube_brightness);
+    Effects::Transition::set_max_brightness(settings.tube_brightness);
+    Effects::Ambient::set_max_brightness(settings.tube_brightness);    
+
+    SoundGenerator::set_tick_tock(static_cast<TickTockSound>(settings.tick_sound));    
+
+    Effects::NumberTransition transition = static_cast<Effects::NumberTransition>(settings.transition_effect);
+    switch(transition) {
+      case Effects::NumberTransition::NONE:
+        Effects::Transition::set_effect(Effects::NumberTransition::NONE, 0);
+        break;
+      case Effects::NumberTransition::FADE_BLACK:
+        Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 11);
+        break;
+      case Effects::NumberTransition::FADE_CROSS:
+        Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 10);
+        break;
+      case Effects::NumberTransition::FLICKER:
+        Effects::Transition::set_effect(Effects::NumberTransition::FLICKER, 13);
+        break;
+    }
+    
+    Effects::Ambient::set_effect(static_cast<Effects::AmbientEffect>(settings.ambient_effect));  
   }
 
   static void process() {    
@@ -38,6 +51,11 @@ public:
 
       time_pair time = RTCSync::current_time();
       Effects::Transition::display(time.hours, time.minutes, {false, false, dot, false});  
+
+    // Load settings from EEPROM
+    //      - Tube saveing timer (off-time span, disable tubes and clicks)
+    //      - Night time mode (ambient light below threshold, reduce light to minimum, disable leds, disable clicks and effects)
+    // Call initialize when one of the modes are left
     }
   }
 
@@ -67,4 +85,5 @@ public:
 private:
   static uint16_t timer;    
   static bool dot;
+  static SettingSet settings;
 };

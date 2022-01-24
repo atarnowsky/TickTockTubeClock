@@ -2,6 +2,7 @@
 
 #include "effects.h"
 #include "base_light.h"
+#include "display.h"
 
 template<uint8_t timeout_seconds = 0>
 class State {

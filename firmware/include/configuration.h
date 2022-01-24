@@ -8,6 +8,8 @@ class SettingInit;
 class SettingLEDBrightness;
 class SettingTubeBrightness;
 class SettingTickSound;
+class SettingTransitionEffect;
+class SettingAmbientEffect;
 class ServiceMenu;
 
 using UI = StateMachine<
@@ -17,5 +19,7 @@ using UI = StateMachine<
   SettingLEDBrightness,
   SettingTubeBrightness,
   SettingTickSound,
+  SettingTransitionEffect,
+  SettingAmbientEffect,
   ServiceMenu
 >;
