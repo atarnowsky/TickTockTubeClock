@@ -199,8 +199,8 @@ namespace Effects {
     }
 
 
-    void Transition::display_option(uint8_t number, uint8_t value) {
-        needs_update = true;
+    void Transition::display_option(uint8_t number, uint8_t value) {        
+        needs_update = false;
 
         auto option = [](uint8_t number, uint8_t value) -> array<uint8_t, 4> 
         {            
@@ -233,7 +233,7 @@ namespace Effects {
         }
 
         array<uint8_t, 4> numbers = option(number, value);
-        constexpr array<bool, 4> dots = {false, false, false, true};
+        const array<bool, 4> dots = {false, false, false, (number != 255)};
 
         for(uint8_t d = 0; d < numbers.size(); d++)
         {
@@ -255,7 +255,7 @@ namespace Effects {
             }
         }
 
-        // Reset timer
+        // Reset timer        
         effect_counter = 0;
         effect_start = millis();
     }

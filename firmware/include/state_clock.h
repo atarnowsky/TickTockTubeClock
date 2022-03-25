@@ -11,6 +11,8 @@
 class Clock : public State<0>{
 public:
   static void initialize() {
+    
+    Effects::Transition::display_option(255, 255);
     settings = Settings::get();
 
     uint8_t brightness = settings.led_brightness;

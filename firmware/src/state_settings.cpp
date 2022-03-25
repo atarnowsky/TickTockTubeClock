@@ -78,7 +78,7 @@ void SettingLEDBrightness::on_select_short() {
     UI::next<SettingTubeBrightness>();
 }
 
-void SettingLEDBrightness::on_timeout() {
+void SettingLEDBrightness::on_timeout() {    
     UI::next<Clock>();
 }
 
