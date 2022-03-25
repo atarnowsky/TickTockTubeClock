@@ -198,6 +198,68 @@ namespace Effects {
         }
     }
 
+
+    void Transition::display_option(uint8_t number, uint8_t value) {
+        needs_update = true;
+
+        auto option = [](uint8_t number, uint8_t value) -> array<uint8_t, 4> 
+        {            
+            array<uint8_t, 4>  result;
+            result[3] = number;
+            result[2] = 255;
+            if(value <= 99) {
+                result[1] = (value / 10) % 10;
+                result[0] = value % 10;
+            } else {
+                result[1] = 255;
+                result[0] = 255;
+            }   
+
+            return result;
+        };
+
+        // Copy buffers. Assume no other task altered the display, so
+        // buffer_last == buffer_next from now on
+        for(uint8_t i = 0; i < register_count; i++)
+            for(uint8_t j = 0; j < 4; j++)
+                buffer_last[j][i] = buffer_next[j][i];
+
+        // Set new target buffer
+        for(uint8_t i = 0; i < register_count; i++) {
+            buffer_next[0][i] = 0b00000000;
+            buffer_next[1][i] = 0b00000000;
+            buffer_next[2][i] = 0b00000000;
+            buffer_next[3][i] = 0b00000000;
+        }
+
+        array<uint8_t, 4> numbers = option(number, value);
+        constexpr array<bool, 4> dots = {false, false, false, true};
+
+        for(uint8_t d = 0; d < numbers.size(); d++)
+        {
+            const bool dot = dots[d];
+            const uint8_t number = numbers[d];    
+            const uint8_t deci = d % 2; // 0 -> minutes/hours, 1 -> deciminutes/decihours
+            const uint8_t lr = d / 2;   // 0 -> right block,   1 -> left block
+            volatile auto& buf_a = buffer_next[deci*2];
+            volatile auto& buf_b = buffer_next[deci*2 + 1];
+            // Every number > 9 will be interpreted as blank
+            if(number < 10) {
+                buf_a[Display::number_mapping[number][lr][0]] |= (1 << Display::number_mapping[number][lr][1]);
+                buf_b[Display::number_mapping[number][lr][0]] |= (1 << Display::number_mapping[number][lr][1]);
+            }
+
+            if(dot) {
+                buf_a[Display::dot_mapping[lr][0]] |= (1 << Display::dot_mapping[lr][1]);
+                buf_b[Display::dot_mapping[lr][0]] |= (1 << Display::dot_mapping[lr][1]);
+            }
+        }
+
+        // Reset timer
+        effect_counter = 0;
+        effect_start = millis();
+    }
+
     void Transition::set_effect(NumberTransition transition, uint8_t duration) {
         effect_transition = transition;
         effect_duration = duration;

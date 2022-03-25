@@ -100,7 +100,6 @@ namespace Display {
     void ShiftPWMProcessor::configure_mux(MUXMask mask){
         mux_mask = mask;
     }
-
     
     void ShiftPWMProcessor::set_brightness(uint8_t target) {
         fade_target = target << slowmotion_factor;

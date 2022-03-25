@@ -58,7 +58,7 @@ void SettingLEDBrightness::finish() {
 void SettingLEDBrightness::process() {
     BaseLightDimmer::set_fade_target(light_map[brightness]);
     BaseLightDimmer::set_brightness(light_map[brightness]);
-    Effects::Transition::display(setting_id, brightness, {false, false, true, false});
+    Effects::Transition::display_option(setting_id, brightness);
 }
 
 void SettingLEDBrightness::on_plus_short() {
@@ -101,7 +101,7 @@ void SettingTubeBrightness::finish() {
 
 void SettingTubeBrightness::process() {
     Display::ShiftPWMProcessor::set_brightness(light_map[brightness]);
-    Effects::Transition::display(setting_id, brightness, {false, false, true, false});
+    Effects::Transition::display_option(setting_id, brightness);
 }
 
 void SettingTubeBrightness::on_plus_short() {
@@ -137,8 +137,8 @@ void SettingTickSound::finish() {
 }
 
 void SettingTickSound::process() {    
-    constexpr static uint16_t second_timeout = 1000/state_update_rate;
-    Effects::Transition::display(setting_id, sound_id, {false, false, true, false});
+    constexpr static uint16_t second_timeout = 1000/state_update_rate;    
+    Effects::Transition::display_option(setting_id, sound_id);
 
     if(timer++ >= second_timeout) {
         timer = 0;         
@@ -181,8 +181,8 @@ void SettingTransitionEffect::finish() {
     Settings::set(Setting::TRANSITION_EFFECT, effect_id);    
 }
 
-void SettingTransitionEffect::process() {    
-    Effects::Transition::display(setting_id, effect_id, {false, false, true, false});
+void SettingTransitionEffect::process() {        
+    Effects::Transition::display_option(setting_id, effect_id);
 }
 
 void SettingTransitionEffect::on_plus_short() {
@@ -217,8 +217,8 @@ void SettingAmbientEffect::finish() {
     Settings::set(Setting::AMBIENT_EFFECT, effect_id);    
 }
 
-void SettingAmbientEffect::process() {    
-    Effects::Transition::display(setting_id, effect_id, {false, false, true, false});
+void SettingAmbientEffect::process() {        
+    Effects::Transition::display_option(setting_id, effect_id);
 }
 
 void SettingAmbientEffect::on_plus_short() {
@@ -255,8 +255,8 @@ void SettingNightMode::finish() {
 
 void SettingNightMode::process() {       
     //uint8_t displayed = threshold;
-    //if(displayed > 99) displayed = 99;
-    Effects::Transition::display(setting_id, 255, {false, false, true, false});
+    //if(displayed > 99) displayed = 99;    
+    Effects::Transition::display_option(setting_id, 255);
 }
 
 void SettingNightMode::on_plus_short() {
@@ -294,7 +294,7 @@ void SettingOffBegin::finish() {
 }
 
 void SettingOffBegin::process() {       
-    Effects::Transition::display(setting_id, hour, {false, false, true, false});
+    Effects::Transition::display_option(setting_id, hour);
 }
 
 void SettingOffBegin::on_plus_short() {
@@ -331,7 +331,7 @@ void SettingOffEnd::finish() {
 }
 
 void SettingOffEnd::process() {       
-    Effects::Transition::display(setting_id, hour, {false, false, true, false});
+    Effects::Transition::display_option(setting_id, hour);
 }
 
 void SettingOffEnd::on_plus_short() {
