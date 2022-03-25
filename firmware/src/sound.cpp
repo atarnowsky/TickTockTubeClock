@@ -62,8 +62,22 @@ namespace SoundGenerator {
         delay(500);
     }
 
+    void nack(){
+        tone(Pins::Speaker.arduino_pin(), 500, 75);
+        delay(75*3/2);    
+        tone(Pins::Speaker.arduino_pin(), 500, 75);
+        delay(75*3/2);    
+        tone(Pins::Speaker.arduino_pin(), 500, 75);
+        delay(75*3/2);    
+    }
+
     void ack_short(){
         tone(Pins::Speaker.arduino_pin(), 1000, 75);
+        delay(75);    
+    }
+
+    void ack_dynamic(uint8_t value, int16_t delta){
+        tone(Pins::Speaker.arduino_pin(), 1000 + value * delta, 75);
         delay(75);    
     }
 

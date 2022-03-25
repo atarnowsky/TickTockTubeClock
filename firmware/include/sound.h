@@ -19,6 +19,8 @@ namespace SoundGenerator  {
 
     void error(uint8_t bits);
 
+    void nack();
+    void ack_dynamic(uint8_t value, int16_t delta);
     void ack_short();
     void ack_long();
     void ack_reset();

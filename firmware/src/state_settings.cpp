@@ -62,18 +62,19 @@ void SettingLEDBrightness::process() {
 }
 
 void SettingLEDBrightness::on_plus_short() {
-    if(brightness >= 10) return;
-    SoundGenerator::ack_short();
+    if(brightness >= 10) return;    
     brightness++;
+    SoundGenerator::ack_short();
 }
 
 void SettingLEDBrightness::on_minus_short() {
     if(brightness == 0) return;
-    SoundGenerator::ack_short();      
     brightness--;
+    SoundGenerator::ack_short();    
 }
 
 void SettingLEDBrightness::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingTubeBrightness>();
 }
 
@@ -116,6 +117,7 @@ void SettingTubeBrightness::on_minus_short() {
 }
 
 void SettingTubeBrightness::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingTickSound>();
 }
 
@@ -160,6 +162,7 @@ void SettingTickSound::on_minus_short() {
 }
 
 void SettingTickSound::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingTransitionEffect>();
 }
 
@@ -195,6 +198,7 @@ void SettingTransitionEffect::on_minus_short() {
 }
 
 void SettingTransitionEffect::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingAmbientEffect>();
 }
 
@@ -230,6 +234,7 @@ void SettingAmbientEffect::on_minus_short() {
 }
 
 void SettingAmbientEffect::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingNightMode>();
 }
 
@@ -249,24 +254,27 @@ void SettingNightMode::finish() {
 }
 
 void SettingNightMode::process() {       
-    uint8_t displayed = threshold;
-    if(displayed > 99) displayed = 99;
-    Effects::Transition::display(setting_id, displayed, {false, false, true, false});
+    //uint8_t displayed = threshold;
+    //if(displayed > 99) displayed = 99;
+    Effects::Transition::display(setting_id, 255, {false, false, true, false});
 }
 
 void SettingNightMode::on_plus_short() {
-    uint32_t lux = AmbientLight::milli_lux()/10;
-    if(lux > 254) lux = 254;
-    threshold = lux + 1;
-    SoundGenerator::ack_short();
+    SoundGenerator::nack();
+    // uint32_t lux = AmbientLight::milli_lux()/10;
+    // if(lux > 254) lux = 254;
+    // threshold = lux + 1;
+    // SoundGenerator::ack_short();
 }
 
 void SettingNightMode::on_minus_short() {
-    threshold = 0;
-    SoundGenerator::ack_short();
+    SoundGenerator::nack();
+    // threshold = 0;
+    // SoundGenerator::ack_short();
 }
 
 void SettingNightMode::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingOffBegin>();
 }
 
@@ -302,6 +310,7 @@ void SettingOffBegin::on_minus_short() {
 }
 
 void SettingOffBegin::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<SettingOffEnd>();
 }
 
@@ -338,6 +347,7 @@ void SettingOffEnd::on_minus_short() {
 }
 
 void SettingOffEnd::on_select_short() {
+    SoundGenerator::ack_short();  
     UI::next<Clock>();
 }
 

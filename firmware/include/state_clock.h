@@ -118,6 +118,7 @@ public:
   }
 
   static void on_select_short() {
+    SoundGenerator::ack_short();
     UI::next<TimeSet>();
   }
 
