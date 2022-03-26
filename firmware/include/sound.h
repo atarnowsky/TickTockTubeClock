@@ -17,8 +17,6 @@ enum class TickTockSound : uint8_t {
 namespace SoundGenerator  {
     void set_tick_tock(TickTockSound v);    
 
-    void error(uint8_t bits);
-
     void nack();
     void ack_dynamic(uint8_t value, int16_t delta);
     void ack_short();

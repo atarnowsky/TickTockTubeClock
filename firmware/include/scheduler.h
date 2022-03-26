@@ -3,7 +3,6 @@
 #include "etl_fix.h"
 #include <TimerOne.h>
 
-
 template<int UpdateRateHerz, typename... Tasks>
 class Scheduler {
  public:    
@@ -94,7 +93,7 @@ class Scheduler {
     // For critical task: number of subsequent task calls, will be reset after 'cycle_count' has been reached
     // For relaxed task: hold the timestamp of the last call procession, so the task is only called ever 'minimal_delay' milliseconds
     static array<uint8_t, sizeof_critical<Tasks...>()> state_critical;
-    static array<uint32_t, sizeof_relaxed<Tasks...>()> state_relaxed;
+    static array<uint32_t, sizeof_relaxed<Tasks...>()> state_relaxed;    
 };
 
 template<int UpdateRateHerz, typename... Tasks>
@@ -127,3 +126,7 @@ class RelaxedTask {
     static constexpr bool critical = false;
     static constexpr uint32_t minimal_delay = desired_delay_ms;
 };
+
+
+void pause_critical();
+void resume_critical();

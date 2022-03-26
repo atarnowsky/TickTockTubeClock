@@ -6,7 +6,7 @@
 #include "hw_map.h"
 #include "etl_fix.h"
 
-static constexpr unsigned long state_update_rate = 50;
+static constexpr unsigned long state_update_rate = 25;
 
 template<typename... States>
 class StateMachine : public RelaxedTask<state_update_rate> {

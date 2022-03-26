@@ -36,7 +36,7 @@ public:
         Effects::Transition::set_effect(Effects::NumberTransition::FADE_BLACK, 11);
         break;
       case Effects::NumberTransition::FADE_CROSS:
-        Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 10);
+        Effects::Transition::set_effect(Effects::NumberTransition::FADE_CROSS, 11);
         break;
       case Effects::NumberTransition::FLICKER:
         Effects::Transition::set_effect(Effects::NumberTransition::FLICKER, 13);

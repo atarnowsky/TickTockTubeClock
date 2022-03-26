@@ -110,7 +110,7 @@ namespace Effects {
                     copy_next();
                 }
 
-                ++effect_counter &= 0b1111;
+                ++effect_counter &= 0b0111;
                 break;
             }
 

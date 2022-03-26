@@ -1,6 +1,7 @@
 #include "sound.h"
 #include "hw_map.h"
 //#include "toneAC2.h"
+#include "scheduler.h"
 
 namespace {
     TickTockSound tick_tock = TickTockSound::None;    
@@ -52,43 +53,42 @@ namespace SoundGenerator {
         tick_tock = v;
     }
 
-    void error(uint8_t bits)
-    {        
-        for(int i = 0; i < 4; i++)
-        {            
-            tone(Pins::Speaker.arduino_pin(), ((bits & (1 << i)) > 0 ? 800 : 400), 250);            
-            delay(500);
-        }
-        delay(500);
-    }
-
     void nack(){
+        pause_critical();
         tone(Pins::Speaker.arduino_pin(), 500, 75);
         delay(75*3/2);    
         tone(Pins::Speaker.arduino_pin(), 500, 75);
         delay(75*3/2);    
         tone(Pins::Speaker.arduino_pin(), 500, 75);
         delay(75*3/2);    
+        resume_critical();
     }
 
     void ack_short(){
+        pause_critical();
         tone(Pins::Speaker.arduino_pin(), 1000, 75);
         delay(75);    
+        resume_critical();
     }
 
     void ack_dynamic(uint8_t value, int16_t delta){
+        pause_critical();
         tone(Pins::Speaker.arduino_pin(), 1000 + value * delta, 75);
         delay(75);    
+        resume_critical();
     }
 
     void ack_long() {
+        pause_critical();
         tone(Pins::Speaker.arduino_pin(), 1000, 75);
         delay(75 + 150);
         tone(Pins::Speaker.arduino_pin(), 2000, 75);
         delay(75);
+        resume_critical();
     }
 
     void ack_reset() {
+        pause_critical();
         tone(Pins::Speaker.arduino_pin(), 1000, 75);
         delay(75 + 150);
         tone(Pins::Speaker.arduino_pin(), 2000, 75);
@@ -97,10 +97,11 @@ namespace SoundGenerator {
             tone(Pins::Speaker.arduino_pin(), 1000, 250);
             delay(500);
         }
+        resume_critical();
     }
 
-    void play(const Note& n) {
+    void play(const Note& n) {        
         tone(Pins::Speaker.arduino_pin(), n[0], n[1]);
-        delay(n[2]);
+        delay(n[2]);        
     }
 }
