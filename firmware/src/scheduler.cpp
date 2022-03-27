@@ -1,4 +1,5 @@
 #include "scheduler.h"
+#include "effects.h"
 #include "hw_map.h"
 
 uint32_t current_time = 0;//millis();
@@ -11,7 +12,9 @@ void time_update() {
     current_time = 0;//millis();
 }
 
-void pause_critical() {            
+void pause_critical() {   
+    Effects::Transition::clear();
+    delay(1);
     Timer1.stop();
     IO::low(Pins::Anode::MuxA, Pins::Anode::MuxB);
 }

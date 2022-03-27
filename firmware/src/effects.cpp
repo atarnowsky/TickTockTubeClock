@@ -123,6 +123,15 @@ namespace Effects {
         }        
     }
 
+    void Transition::clear() {
+        for(uint8_t i = 0; i < register_count; i++) 
+            for(uint8_t j = 0; j < 4; j++) {
+                buffer_next[j][i] = 0b00000000;
+                buffer_last[j][i] = 0b00000000;
+        }
+        needs_update = true;
+    }
+
     void Transition::display(uint16_t value) {
         display(value/100, value%100);
     }
