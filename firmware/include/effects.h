@@ -30,9 +30,10 @@ namespace Effects {
       static void set_effect(NumberTransition transition, uint8_t duration_shift = 9);
       static void set_max_brightness(uint8_t brightness = 255);
       static uint16_t current_number();
+      static bool running();
 
    private:
-      static uint8_t max_brightness;
+      static uint8_t max_brightness;      
    };
 
    class Ambient : public RelaxedTask<10> {

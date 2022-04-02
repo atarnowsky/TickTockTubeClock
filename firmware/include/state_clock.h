@@ -52,9 +52,15 @@ public:
     constexpr static uint16_t second_timeout = 1000/state_update_rate;   
 
     if(timer++ >= second_timeout) {
-      timer = 0;
-      dot = !dot;
+
+      timer = 0;      
       SoundGenerator::tick();
+
+      // Quick fix for dot transition flickering:
+      // Just do not change new target while animating...
+      if(Effects::Transition::running()) return;
+
+      dot = !dot;
 
       time_pair time = RTCSync::current_time();
       if(!shutdown_active) {

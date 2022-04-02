@@ -29,6 +29,7 @@ namespace Effects {
         uint16_t effect_counter = 0;
         uint8_t displayed_hours = 255;
         uint8_t displayed_minutes = 255;
+        bool is_running = false;
     }
 
     uint8_t Transition::max_brightness = 255;
@@ -37,6 +38,10 @@ namespace Effects {
     
     void Transition::initialize() {
 
+    }
+
+    bool Transition::running() {
+        return is_running;
     }
 
     void Transition::set_max_brightness(uint8_t brightness) {
@@ -53,8 +58,11 @@ namespace Effects {
         if(elapsed > (uint16_t(1) << effect_duration)) {
             if(needs_update) copy_next();
             needs_update = false;
+            is_running = false;
             return; // Effect passed, nothing to do
         }
+
+        is_running = true;
 
         auto copy_last = [&]() {
             Display::ShiftPWMProcessor::alter_buffer(buffer_last);
@@ -241,12 +249,10 @@ namespace Effects {
             buffer_next[3][i] = 0b00000000;
         }
 
-        array<uint8_t, 4> numbers = option(number, value);
-        const array<bool, 4> dots = {false, false, false, (number != 255)};
+        array<uint8_t, 4> numbers = option(number, value);        
 
         for(uint8_t d = 0; d < numbers.size(); d++)
         {
-            const bool dot = dots[d];
             const uint8_t number = numbers[d];    
             const uint8_t deci = d % 2; // 0 -> minutes/hours, 1 -> deciminutes/decihours
             const uint8_t lr = d / 2;   // 0 -> right block,   1 -> left block
@@ -256,11 +262,6 @@ namespace Effects {
             if(number < 10) {
                 buf_a[Display::number_mapping[number][lr][0]] |= (1 << Display::number_mapping[number][lr][1]);
                 buf_b[Display::number_mapping[number][lr][0]] |= (1 << Display::number_mapping[number][lr][1]);
-            }
-
-            if(dot) {
-                buf_a[Display::dot_mapping[lr][0]] |= (1 << Display::dot_mapping[lr][1]);
-                buf_b[Display::dot_mapping[lr][0]] |= (1 << Display::dot_mapping[lr][1]);
             }
         }
 

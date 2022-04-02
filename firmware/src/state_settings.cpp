@@ -15,6 +15,20 @@ constexpr uint8_t light_map[] = {
     255 
 };
 
+constexpr uint8_t led_map[] = {
+    0,
+    8,
+    16,
+    24,
+    32,
+    40, 
+    48,
+    56,
+    64,
+    72,
+    80 
+};
+
 
 uint8_t SettingLEDBrightness::brightness{10};
 uint8_t SettingTubeBrightness::brightness{10};
@@ -43,7 +57,7 @@ void SettingInit::initialize() {
 void SettingLEDBrightness::initialize() {    
     uint8_t target = Settings::get(Setting::LED_BRIGHTNESS);
     for(uint8_t i = 0; i <= 10; i++) {
-        if(light_map[i] == target) {
+        if(led_map[i] == target) {
             brightness = i;
             break;
         }
@@ -51,13 +65,13 @@ void SettingLEDBrightness::initialize() {
 }
 
 void SettingLEDBrightness::finish() {     
-    Settings::set(Setting::LED_BRIGHTNESS, light_map[brightness]);
+    Settings::set(Setting::LED_BRIGHTNESS, led_map[brightness]);
     BaseLightDimmer::set_fade_target(0);
 }
 
 void SettingLEDBrightness::process() {
-    BaseLightDimmer::set_fade_target(light_map[brightness]);
-    BaseLightDimmer::set_brightness(light_map[brightness]);
+    BaseLightDimmer::set_fade_target(led_map[brightness]);
+    BaseLightDimmer::set_brightness(led_map[brightness]);
     Effects::Transition::display_option(setting_id, brightness);
 }
 
