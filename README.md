@@ -4,7 +4,7 @@ The TickTockTubeClock is an open source, open hardware Nixie-Clock with pleasing
 
 
 ## Background & Introduction
-Back in 2020 I gained more and more interest in CNC machining as well as electronic engineering. Searching for a project to overcome lockdown during the pandemic, I stumbled upon an old, defective electrical calculator made by Canon in the late sixties (a Monroe 630, to be more precise - similar to [this one](https://www.oldcalculatormuseum.com/monroe620.html)). Luckily, all 14 Nixie tubes were in good shape, so I decided to make some clocks of them.
+Back in 2020 I gained more and more interest in CNC machining as well as electronic engineering. Searching for a project to overcome lockdown during the pandemic, I stumbled upon an old, defective electrical calculator made by Canon in the late sixties (a Monroe 630, to be more precise - similar to [this one](https://www.oldcalculatormuseum.com/monroe620.html)). Luckily, all 14 Nixie tubes were in good shape, so I decided to make some clocks out of them.
 
 There are many different designs [out there](http://www.electricstuff.co.uk/nixiegallery.html). However, I felt most of them being a little bit too clumsy for the very small [CD81 Tubes from Hitachi](https://www.swissnixie.com/tubes/CD81/), that have been salvaged from the calculator. With the digits only being about 13 mm in height, I decided to design a housing that aesthetically complements these tiny tubes before actually thinking about how to get this thing to work electrically (not to mention to manufacture the housing). There just *had* to be a way to shrink down the electronics...
 
@@ -28,9 +28,8 @@ There are many different designs [out there](http://www.electricstuff.co.uk/nixi
   * Anti cathode poisoning mode
 
 ## Gallery
-| | | | |
-|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
 |![TickTockTubeClock](doc/gallery/002.jpg)|![TickTockTubeClock](doc/gallery/001.jpg)|![TickTockTubeClock](doc/gallery/007.jpg)|![TickTockTubeClock](doc/gallery/005.jpg)|
+|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
 |![TickTockTubeClock](doc/gallery/004.jpg)|![TickTockTubeClock](doc/gallery/006.jpg)|![TickTockTubeClock](doc/gallery/003.jpg)|![TickTockTubeClock](doc/gallery/008.jpg)|
 
 # Technical Data & General Concept
@@ -46,7 +45,7 @@ The clock consist of multiple parts to achieve the small form factor:
 | Mechnical specs. | | Electrical specs. | |
 | - | -: | - | -: |
 | Dimensions (width × depth × height) | 9.5 × 2.45 × 5.0 cm | Supply voltage | 5V |
-| Weight | approx. xx g| maximum power consumption | 2.5 W |
+| Weight | approx. 35 g| maximum power consumption | 2.5 W |
 | electrical components | 114 | Accuracy | ±2.6 minutes/year |
 
 <br /><br />
